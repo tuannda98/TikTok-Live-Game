@@ -2,17 +2,16 @@
  * race-engine.js
  * Pure state machine for Horse Racing.
  * NO DOM, NO Canvas — just data in, state out.
- * The renderer (game.js) reads state and draws.
  *
  * Phases: WAITING → COUNTDOWN → RACING → FINISHED → COOLDOWN → WAITING
+ *
+ * Engine đọc config.horses, config.resolveGift(), config.resolveCommand()
+ * để xử lý event — không có logic hard-code nào ở đây.
  *
  * @module games/horse-racing/race-engine
  */
 
 class RaceEngine {
-	/**
-	 * @param {Object} config - RACE_CONFIG from config.js
-	 */
 	constructor(config) {
 		this.config = config;
 		this.listeners = {};
@@ -24,18 +23,17 @@ class RaceEngine {
 	// ==========================================
 
 	reset() {
-		const laneCount = this.config.lanes.length;
 		this.state = {
 			phase: "waiting",
 			phaseStartedAt: Date.now(),
-			lanes: this.config.lanes.map((lane) => ({
-				...lane,
+			horses: this.config.horses.map((horse) => ({
+				...horse,
 				distance: 0,
 				supporters: new Map(), // uniqueId → { nickname, totalContrib }
 			})),
 			winner: null,
 			raceCount: this.state?.raceCount || 0,
-			recentEvents: [], // last N events for HUD feed
+			recentEvents: [],
 		};
 		this._emit("phaseChange", { phase: "waiting" });
 	}
@@ -44,22 +42,16 @@ class RaceEngine {
 	// PHASE TRANSITIONS
 	// ==========================================
 
-	/**
-	 * Advance phase. Called by a tick loop or event trigger.
-	 * @param {string} nextPhase
-	 */
 	_setPhase(nextPhase) {
 		this.state.phase = nextPhase;
 		this.state.phaseStartedAt = Date.now();
 		this._emit("phaseChange", { phase: nextPhase });
 	}
 
-	/** Time elapsed in current phase (ms) */
 	phaseElapsed() {
 		return Date.now() - this.state.phaseStartedAt;
 	}
 
-	/** Time remaining in current phase (ms), or Infinity */
 	phaseRemaining() {
 		const dur = this.config.phases[this.state.phase]?.duration ?? Infinity;
 		if (dur === Infinity) return Infinity;
@@ -70,10 +62,6 @@ class RaceEngine {
 	// TICK — call from requestAnimationFrame
 	// ==========================================
 
-	/**
-	 * Main update tick. Handles phase timeouts / auto-transitions.
-	 * Returns current state for rendering.
-	 */
 	tick() {
 		const { phase } = this.state;
 		const remaining = this.phaseRemaining();
@@ -81,7 +69,6 @@ class RaceEngine {
 		if (phase === "countdown" && remaining <= 0) {
 			this._setPhase("racing");
 		} else if (phase === "racing" && remaining <= 0) {
-			// Time limit — pick horse with most distance as winner
 			this._resolveWinner();
 		} else if (phase === "finished" && remaining <= 0) {
 			this._setPhase("cooldown");
@@ -94,86 +81,71 @@ class RaceEngine {
 	}
 
 	// ==========================================
-	// EVENT HANDLERS (called by game.js)
+	// EVENT HANDLERS
 	// ==========================================
 
 	/**
-	 * Process a gift event.
-	 * @param {{giftId: number, giftValue: number, user: {uniqueId: string, nickname: string}}} data
+	 * Xử lý gift event.
+	 * Config.resolveGift() quyết định ngựa nào nhận điểm.
 	 */
 	handleGift(data) {
 		const { phase } = this.state;
 
-		// In waiting phase, first gift triggers countdown
 		if (phase === "waiting") {
 			this._setPhase("countdown");
 		}
 
-		// During countdown and racing, gifts move horses
 		if (phase === "countdown" || phase === "racing") {
-			const laneCount = this.state.lanes.length;
-			// Name-based mapping (priority) with giftId fallback
-			const laneIdx = this.config.giftToLane(data.giftName, data.giftId, laneCount);
+			const horseId = this.config.resolveGift(data.giftName, data.giftId);
 			const distance = this.config.giftToDistance(data.giftValue);
 
-			this._moveLane(laneIdx, distance, data.user, data);
+			this._moveHorse(horseId, distance, data.user, {
+				type: "gift",
+				giftName: data.giftName || "",
+				giftEmoji: this.config.getGiftEmoji(data.giftName),
+			});
 
-			// Check for winner (only during racing)
-			if (phase === "racing") {
-				this._checkFinish();
-			}
+			if (phase === "racing") this._checkFinish();
 		}
 	}
 
 	/**
-	 * Process a chat event.
-	 * If comment matches a country code/alias, move that horse.
-	 * @param {{user: {uniqueId: string, nickname: string}, comment: string}} data
+	 * Xử lý chat event.
+	 * Config.resolveCommand() quyết định action (vote, v.v.)
 	 */
 	handleChat(data) {
 		const { phase } = this.state;
-		const comment = (data.comment || "").trim();
+		const text = (data.comment || "").trim();
 
-		// Try to match comment to a lane
-		const laneIdx = this.config.chatToLane(comment);
+		const cmd = this.config.resolveCommand(text);
 
-		if (laneIdx >= 0) {
-			// In waiting phase, first vote triggers countdown
+		if (cmd) {
 			if (phase === "waiting") {
 				this._setPhase("countdown");
 			}
 
-			// During countdown and racing, votes move horses
 			if (phase === "countdown" || phase === "racing") {
-				const distance = this.config.chatDistance || 3;
-				const lane = this.state.lanes[laneIdx];
-
-				this._moveLane(laneIdx, distance, data.user, {
-					giftName: null,
-					_isChat: true,
-					_comment: comment,
-					_laneFlag: lane?.flag || "",
-				});
-
-				// Check for winner (only during racing)
-				if (phase === "racing") {
-					this._checkFinish();
+				if (cmd.action === "vote") {
+					const distance = this.config.voteDistance || 3;
+					const horse = this.state.horses[cmd.horseId];
+					this._moveHorse(cmd.horseId, distance, data.user, {
+						type: "vote",
+						comment: text,
+						horseIcon: horse?.icon || "",
+					});
+					if (phase === "racing") this._checkFinish();
 				}
 			}
 		} else {
-			// Non-matching chat — just add to feed
+			// Không khớp command nào — hiển thị trên feed
 			this._addRecentEvent({
 				type: "chat",
 				nickname: data.user.nickname,
-				text: comment,
+				text,
 			});
 		}
 	}
 
-	/**
-	 * Process a like event.
-	 * @param {{user: {uniqueId: string, nickname: string}, likeCount: number}} data
-	 */
 	handleLike(data) {
 		this._addRecentEvent({
 			type: "like",
@@ -186,77 +158,67 @@ class RaceEngine {
 	// INTERNAL
 	// ==========================================
 
-	/**
-	 * Move a lane forward and track supporter contribution.
-	 * @private
-	 */
-	_moveLane(laneIdx, distance, user, rawData) {
-		const lane = this.state.lanes[laneIdx];
-		if (!lane) return;
+	_moveHorse(horseId, distance, user, eventExtra) {
+		const horse = this.state.horses[horseId];
+		if (!horse) return;
 
-		lane.distance = Math.min(lane.distance + distance, this.config.finishLine);
+		horse.distance = Math.min(horse.distance + distance, this.config.finishLine);
 
-		// Track supporter
-		const existing = lane.supporters.get(user.uniqueId);
+		const existing = horse.supporters.get(user.uniqueId);
 		if (existing) {
 			existing.totalContrib += distance;
 		} else {
-			lane.supporters.set(user.uniqueId, {
+			horse.supporters.set(user.uniqueId, {
 				nickname: user.nickname,
 				totalContrib: distance,
 			});
 		}
 
-		if (rawData._isChat) {
-			// Chat vote event
+		if (eventExtra.type === "vote") {
 			this._addRecentEvent({
 				type: "vote",
 				nickname: user.nickname,
-				laneFlag: lane.flag,
-				laneName: lane.name,
+				horseIcon: eventExtra.horseIcon,
+				horseName: horse.name,
 				distance,
-				comment: rawData._comment,
+				comment: eventExtra.comment,
 			});
 		} else {
-			// Gift event
 			this._addRecentEvent({
 				type: "gift",
 				nickname: user.nickname,
-				laneFlag: lane.flag,
-				laneName: lane.name,
+				horseIcon: horse.icon,
+				horseName: horse.name,
 				distance,
-				giftName: rawData.giftName || "",
-				giftEmoji: this.config.getGiftEmoji(rawData.giftName),
+				giftName: eventExtra.giftName,
+				giftEmoji: eventExtra.giftEmoji,
 			});
 		}
 
-		this._emit("laneMove", { laneIdx, distance, lane, user });
+		this._emit("horseMove", { horseId, distance, horse, user });
 	}
 
-	/** @private */
 	_checkFinish() {
-		for (const lane of this.state.lanes) {
-			if (lane.distance >= this.config.finishLine) {
-				this.state.winner = lane;
+		for (const horse of this.state.horses) {
+			if (horse.distance >= this.config.finishLine) {
+				this.state.winner = horse;
 				this._setPhase("finished");
-				this._emit("raceFinished", { winner: lane });
+				this._emit("raceFinished", { winner: horse });
 				return;
 			}
 		}
 	}
 
-	/** @private — fallback when race times out */
 	_resolveWinner() {
-		let best = this.state.lanes[0];
-		for (const lane of this.state.lanes) {
-			if (lane.distance > best.distance) best = lane;
+		let best = this.state.horses[0];
+		for (const horse of this.state.horses) {
+			if (horse.distance > best.distance) best = horse;
 		}
 		this.state.winner = best;
 		this._setPhase("finished");
 		this._emit("raceFinished", { winner: best });
 	}
 
-	/** @private — keep last 20 events for HUD feed */
 	_addRecentEvent(evt) {
 		evt.timestamp = Date.now();
 		this.state.recentEvents.unshift(evt);
@@ -266,7 +228,7 @@ class RaceEngine {
 	}
 
 	// ==========================================
-	// EVENT EMITTER (simple)
+	// EVENT EMITTER
 	// ==========================================
 
 	on(event, fn) {
@@ -284,7 +246,6 @@ class RaceEngine {
 	}
 }
 
-// Export for browser global
 if (typeof module !== "undefined" && module.exports) {
 	module.exports = RaceEngine;
 } else {

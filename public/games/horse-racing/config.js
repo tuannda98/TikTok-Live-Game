@@ -1,193 +1,173 @@
 /**
  * config.js
- * Horse Racing game configuration.
+ * Horse Racing — toàn bộ cấu hình game ở đây.
  *
- * LANE SYSTEM:
- * - Each lane = a country flag (viewers root for their country).
- * - Gifts are mapped to lanes by name, balanced across value tiers.
- * - Overlay shows which gift powers which horse.
- *
- * CUSTOMIZING:
- * - Use debug.html to discover exact gift names from your TikTok stream.
- * - Update giftTiers below to match your audience's available gifts.
+ * Để tùy chỉnh game, chỉ cần sửa file này:
+ *   1. horses   — tên, icon, màu của từng ngựa
+ *   2. giftRules  — gift nào → ngựa nào nhận điểm
+ *   3. chatCommands — lệnh chat nào → action gì
+ *   4. phases   — thời gian từng giai đoạn
+ *   5. finishLine / voteDistance / giftToDistance — cơ chế tính điểm
  *
  * @module games/horse-racing/config
  */
 
 const CONFIG = {
 	// ==========================================
-	// LANES (HORSES = COUNTRY FLAGS)
-	// Top TikTok markets in Asia
+	// 1. HORSES — tên, icon (emoji), màu
 	// ==========================================
-	lanes: [
-		{ id: 0, name: "Vietnam", flag: "🇻🇳", color: "#FF4444", aliases: ["vn", "vietnam", "viet nam", "viet"] },
-		{ id: 1, name: "Thailand", flag: "🇹🇭", color: "#4488FF", aliases: ["th", "tl", "thailand", "thai"] },
-		{ id: 2, name: "Indonesia", flag: "🇮🇩", color: "#44DD44", aliases: ["id", "indonesia", "indo"] },
-		{ id: 3, name: "Malaysia", flag: "🇲🇾", color: "#FFCC00", aliases: ["my", "ml", "malaysia", "malay"] },
-		{ id: 4, name: "China", flag: "🇨🇳", color: "#CC44FF", aliases: ["cn", "china", "trung quoc", "trung"] },
+	horses: [
+		{ id: 0, name: "Vietnam",   icon: "🇻🇳", color: "#FF4444" },
+		{ id: 1, name: "Thailand",  icon: "🇹🇭", color: "#4488FF" },
+		{ id: 2, name: "Indonesia", icon: "🇮🇩", color: "#44DD44" },
+		{ id: 3, name: "Malaysia",  icon: "🇲🇾", color: "#FFCC00" },
+		{ id: 4, name: "China",     icon: "🇨🇳", color: "#CC44FF" },
 	],
 
 	// ==========================================
-	// GIFT → LANE MAPPING (by value tier)
-	// Each tier: equal-cost gifts, one per lane.
-	// Array index = lane index (0=VN, 1=TH, 2=ID, 3=MY, 4=CN).
+	// 2. GIFT RULES — gift nào vào ngựa nào
+	//
+	// giftName : tên chính xác của gift trên TikTok (dùng debug.html để xem)
+	// horseId  : id của ngựa trong mảng horses bên trên (0-4)
+	// emoji    : emoji hiển thị trong event feed
 	// ==========================================
-	giftTiers: [
-		{
-			coins: 1,
-			gifts: [
-				{ name: "Rose", emoji: "🌹" },
-				{ name: "GG", emoji: "✌️" },
-				{ name: "Ice Cream Cone", emoji: "🍦" },
-				{ name: "Finger Heart", emoji: "🫰" },
-				{ name: "TikTok", emoji: "🎵" },
-			],
-		},
-		{
-			coins: 5,
-			gifts: [
-				{ name: "Hand Heart", emoji: "💕" },
-				{ name: "Little Crown", emoji: "👑" },
-				{ name: "Butterfly", emoji: "🦋" },
-				{ name: "Love You", emoji: "💗" },
-				{ name: "Wishing Bottle", emoji: "🧴" },
-			],
-		},
-		{
-			coins: 10,
-			gifts: [
-				{ name: "Perfume", emoji: "💐" },
-				{ name: "Doughnut", emoji: "🍩" },
-				{ name: "Cap", emoji: "🧢" },
-				{ name: "Paper Crane", emoji: "🕊️" },
-				{ name: "Sunglasses", emoji: "🕶️" },
-			],
-		},
-		{
-			coins: 99,
-			gifts: [
-				{ name: "Garland", emoji: "🏵️" },
-				{ name: "Singing Mic", emoji: "🎤" },
-				{ name: "Star", emoji: "⭐" },
-				{ name: "Concert", emoji: "🎸" },
-				{ name: "Lock and Key", emoji: "🔐" },
-			],
-		},
+	giftRules: [
+		// --- 1 coin ---
+		{ giftName: "Rose",           horseId: 0, emoji: "🌹" },
+		{ giftName: "GG",             horseId: 1, emoji: "✌️" },
+		{ giftName: "Ice Cream Cone", horseId: 2, emoji: "🍦" },
+		{ giftName: "Finger Heart",   horseId: 3, emoji: "🫰" },
+		{ giftName: "TikTok",         horseId: 4, emoji: "🎵" },
+		{ giftName: "Headphone",      horseId: 1, emoji: "🎧" },
+		{ giftName: "You're awesome", horseId: 4, emoji: "☀️" },
+		// --- 5 coins ---
+		{ giftName: "Hand Heart",     horseId: 0, emoji: "💕" },
+		{ giftName: "Little Crown",   horseId: 1, emoji: "👑" },
+		{ giftName: "Butterfly",      horseId: 2, emoji: "🦋" },
+		{ giftName: "Love You",       horseId: 3, emoji: "💗" },
+		{ giftName: "Wishing Bottle", horseId: 4, emoji: "🧴" },
+		// --- 10 coins ---
+		{ giftName: "Perfume",        horseId: 0, emoji: "💐" },
+		{ giftName: "Doughnut",       horseId: 1, emoji: "🍩" },
+		{ giftName: "Cap",            horseId: 2, emoji: "🧢" },
+		{ giftName: "Paper Crane",    horseId: 3, emoji: "🕊️" },
+		{ giftName: "Sunglasses",     horseId: 4, emoji: "🕶️" },
+		// --- 99 coins ---
+		{ giftName: "Garland",        horseId: 0, emoji: "🏵️" },
+		{ giftName: "Singing Mic",    horseId: 1, emoji: "🎤" },
+		{ giftName: "Star",           horseId: 2, emoji: "⭐" },
+		{ giftName: "Concert",        horseId: 3, emoji: "🎸" },
+		{ giftName: "Lock and Key",   horseId: 4, emoji: "🔐" },
 	],
 
 	// ==========================================
-	// RACE PHASES & TIMING (ms)
+	// 3. CHAT COMMANDS — lệnh chat → action
+	//
+	// keywords : danh sách từ khóa (không phân biệt hoa thường)
+	// action   : "vote" = cộng điểm cho ngựa
+	// horseId  : id ngựa nhận điểm (theo mảng horses)
+	// ==========================================
+	chatCommands: [
+		{ keywords: ["1", "vn", "vietnam", "viet"],          action: "vote", horseId: 0 },
+		{ keywords: ["2", "th", "tl", "thailand", "thai"],   action: "vote", horseId: 1 },
+		{ keywords: ["3", "id", "indonesia", "indo"],        action: "vote", horseId: 2 },
+		{ keywords: ["4", "my", "ml", "malaysia", "malay"],  action: "vote", horseId: 3 },
+		{ keywords: ["5", "cn", "china", "trung quoc"],      action: "vote", horseId: 4 },
+	],
+
+	// ==========================================
+	// 4. PHASES & TIMING (ms)
 	// ==========================================
 	phases: {
-		/** WAITING — lobby, waiting for first gift to start countdown */
-		waiting: { duration: Infinity },
-		/** COUNTDOWN — 10s before race begins */
+		waiting:   { duration: Infinity },
 		countdown: { duration: 10_000 },
-		/** RACING — gifts move horses, first to finish wins */
-		racing: { duration: 120_000 }, // max race length (2 min failsafe)
-		/** FINISHED — show winner for 8s */
-		finished: { duration: 8_000 },
-		/** COOLDOWN — brief pause before auto-reset */
-		cooldown: { duration: 5_000 },
+		racing:    { duration: 120_000 },
+		finished:  { duration: 8_000 },
+		cooldown:  { duration: 5_000 },
 	},
 
 	// ==========================================
-	// RACE MECHANICS
+	// 5. CƠ CHẾ TÍNH ĐIỂM
 	// ==========================================
-	/** Distance (arbitrary units) a horse must reach to win */
+
+	/** Khoảng cách cần đạt để thắng */
 	finishLine: 1000,
 
-	/** Distance a single chat vote gives (much less than gifts) */
-	chatDistance: 3,
+	/** Điểm cộng khi vote bằng chat */
+	voteDistance: 3,
 
 	/**
-	 * Convert gift diamond value to movement distance.
-	 * Tunable: base + multiplier * sqrt(value) gives diminishing returns on mega-gifts.
+	 * Công thức chuyển đổi giá trị gift (coins) → điểm di chuyển.
+	 * Diminishing returns: gift đắt hơn tốt hơn nhưng không tuyến tính.
 	 */
-	giftToDistance(giftValue) {
-		return Math.round(5 + 3 * Math.sqrt(giftValue));
+	giftToDistance(coins) {
+		return Math.round(5 + 3 * Math.sqrt(coins));
 	},
 
+	// ==========================================
+	// INTERNAL HELPERS — không cần chỉnh
+	// ==========================================
+
 	/**
-	 * Resolve gift → lane index.
-	 * Priority: 1) giftName match in tier map, 2) giftId % lanes fallback.
+	 * Tìm horseId từ tên gift. Fallback: giftId % số ngựa.
+	 * @returns {number} horseId
 	 */
-	giftToLane(giftName, giftId, laneCount) {
-		// Build name→lane lookup on first call (lazy init)
-		if (!this._giftNameMap) {
-			this._giftNameMap = {};
-			for (const tier of this.giftTiers) {
-				tier.gifts.forEach((g, idx) => {
-					this._giftNameMap[g.name.toLowerCase()] = idx;
-				});
+	resolveGift(giftName, giftId) {
+		if (!this._giftMap) {
+			this._giftMap = {};
+			for (const rule of this.giftRules) {
+				this._giftMap[rule.giftName.toLowerCase()] = rule.horseId;
 			}
 		}
 		const key = (giftName || "").toLowerCase();
-		if (key && this._giftNameMap[key] !== undefined) {
-			return this._giftNameMap[key];
+		if (key && this._giftMap[key] !== undefined) {
+			return this._giftMap[key];
 		}
-		// Fallback for unmapped gifts
-		return Math.abs(giftId || 0) % laneCount;
+		return Math.abs(giftId || 0) % this.horses.length;
 	},
 
 	/**
-	 * Get gift emoji by name (for HUD/feed display).
+	 * Tìm command từ text chat.
+	 * @returns {{ action: string, horseId: number } | null}
+	 */
+	resolveCommand(text) {
+		if (!this._commandMap) {
+			this._commandMap = {};
+			for (const cmd of this.chatCommands) {
+				for (const kw of cmd.keywords) {
+					this._commandMap[kw.toLowerCase()] = cmd;
+				}
+			}
+		}
+		const key = (text || "").toLowerCase().trim();
+		return this._commandMap[key] ?? null;
+	},
+
+	/**
+	 * Lấy emoji của gift theo tên (cho event feed).
+	 * @returns {string}
 	 */
 	getGiftEmoji(giftName) {
-		if (!this._giftEmojiMap) {
-			this._giftEmojiMap = {};
-			for (const tier of this.giftTiers) {
-				for (const g of tier.gifts) {
-					this._giftEmojiMap[g.name.toLowerCase()] = g.emoji;
-				}
+		if (!this._emojiMap) {
+			this._emojiMap = {};
+			for (const rule of this.giftRules) {
+				this._emojiMap[rule.giftName.toLowerCase()] = rule.emoji;
 			}
 		}
-		return this._giftEmojiMap[(giftName || "").toLowerCase()] || "🎁";
+		return this._emojiMap[(giftName || "").toLowerCase()] || "🎁";
 	},
 
 	/**
-	 * Get all gift emojis for a lane (for HUD legend).
-	 * @param {number} laneIdx
-	 * @returns {string[]} Array of emoji strings
+	 * Lấy tất cả emoji gift của một ngựa (cho HUD legend).
+	 * @returns {string[]}
 	 */
-	getLaneGiftEmojis(laneIdx) {
-		return this.giftTiers
-			.map((tier) => tier.gifts[laneIdx]?.emoji)
-			.filter(Boolean);
-	},
-
-	/**
-	 * Chat-based lane selection.
-	 * Viewer types country code (VN, TH, ID, MY, CN), aliases, or number 1-5.
-	 * Case-insensitive, trimmed.
-	 * @returns {number} lane index or -1 if no match
-	 */
-	chatToLane(comment) {
-		const text = (comment || "").toLowerCase().trim();
-		if (!text) return -1;
-
-		// Number shortcut: "1"-"5"
-		const num = parseInt(text, 10);
-		if (num >= 1 && num <= this.lanes.length) return num - 1;
-
-		// Build alias lookup on first call (lazy init)
-		if (!this._chatAliasMap) {
-			this._chatAliasMap = {};
-			for (const lane of this.lanes) {
-				// Country name itself
-				this._chatAliasMap[lane.name.toLowerCase()] = lane.id;
-				// All aliases
-				for (const alias of lane.aliases || []) {
-					this._chatAliasMap[alias.toLowerCase()] = lane.id;
-				}
-			}
-		}
-
-		return this._chatAliasMap[text] ?? -1;
+	getHorseGiftEmojis(horseId) {
+		return this.giftRules
+			.filter((r) => r.horseId === horseId)
+			.map((r) => r.emoji);
 	},
 };
 
-// Make available in both module and browser global contexts
 if (typeof module !== "undefined" && module.exports) {
 	module.exports = CONFIG;
 } else {
