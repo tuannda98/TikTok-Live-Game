@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sàn Bar Ảo — TikTok Live</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <canvas id="barCanvas"></canvas>
+
+  <!-- Socket.io + TikTok Bridge (must be first) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/lib/tiktok-bridge.js"></script>
+
+  <!-- Game modules (strict load order — each depends on the ones above) -->
+  <script src="config.js"></script>
+  <script src="avatar-loader.js"></script>
+  <script src="vfx-system.js"></script>
+  <script src="mini-games.js"></script>
+  <script src="bar-engine.js"></script>
+  <script src="renderer.js"></script>
+
+  <!-- Entry point — wires TikTokBridge events to engine + render loop -->
+  <script src="game.js"></script>
+
+</body>
+</html>

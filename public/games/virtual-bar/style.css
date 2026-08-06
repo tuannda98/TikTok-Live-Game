@@ -1,0 +1,26 @@
+/* Virtual Bar Game — OBS overlay styles.
+   Background must stay transparent for OBS Browser Source. */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+#barCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
