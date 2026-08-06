@@ -1,0 +1,18 @@
+# Aggregated Python dependencies for .claude/skills/.venv
+# Installed by install.sh via `uv pip install -r .claude/skills/requirements.txt`
+# Python 3.10+ required
+
+# ── ai-multimodal ─────────────────────────────────────────────────────
+google-genai>=0.1.0
+pypdf>=4.0.0
+python-docx>=1.0.0
+docx2pdf>=0.1.8 ; sys_platform == "win32"
+markdown>=3.5.0
+Pillow>=10.0.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# ── Testing (shared across skills) ────────────────────────────────────
+pytest>=8.0.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0

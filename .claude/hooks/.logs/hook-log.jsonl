@@ -1,0 +1,154 @@
+{"ts":"2026-08-05T13:58:12.692Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":58,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:12.931Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/index.css\""}
+{"ts":"2026-08-05T13:58:36.015Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:36.017Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:36.017Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/index.css\""}
+{"ts":"2026-08-05T13:58:42.709Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:42.721Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/contexts/HeaderActionContext.tsx\""}
+{"ts":"2026-08-05T13:58:42.710Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:50.832Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:50.857Z","hook":"privacy-block","event":"PreToolUse","tool":"Glob","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:50.842Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/*\""}
+{"ts":"2026-08-05T13:58:50.837Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS\""}
+{"ts":"2026-08-05T13:58:54.875Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:54.880Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/backend/package.json\""}
+{"ts":"2026-08-05T13:58:54.912Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/package.json\""}
+{"ts":"2026-08-05T13:58:54.902Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:55.354Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/docker-compose.yml\""}
+{"ts":"2026-08-05T13:58:55.356Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:58:55.595Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/backend/src/main.ts\""}
+{"ts":"2026-08-05T13:58:55.598Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:00.193Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:00.196Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/backend/src/app.module.ts\""}
+{"ts":"2026-08-05T13:59:00.686Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:00.689Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/mobile/app/build.gradle.kts\""}
+{"ts":"2026-08-05T13:59:01.070Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:01.071Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/backend/.env.example\""}
+{"ts":"2026-08-05T13:59:01.587Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/vite.config.ts\""}
+{"ts":"2026-08-05T13:59:01.589Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:04.173Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:04.176Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/mobile/app/src/main/java/com/tuannda/atvs/MainActivity.kt\""}
+{"ts":"2026-08-05T13:59:04.592Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:04.592Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/backend/src/device/device.gateway.ts\""}
+{"ts":"2026-08-05T13:59:04.835Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:04.837Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/backend/src/telegram/telegram.service.ts\""}
+{"ts":"2026-08-05T13:59:07.589Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:07.595Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/mobile/app/src/main/java/com/tuannda/atvs\""}
+{"ts":"2026-08-05T13:59:08.038Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:08.042Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/README.md\""}
+{"ts":"2026-08-05T13:59:19.988Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:19.997Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:20.000Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/Sidebar.tsx\""}
+{"ts":"2026-08-05T13:59:41.896Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:41.899Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:41.901Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/components/SearchModal.tsx\""}
+{"ts":"2026-08-05T13:59:41.956Z","hook":"privacy-block","event":"PreToolUse","tool":"Glob","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:41.953Z","hook":"scout-block","event":"PreToolUse","tool":"Glob","target":"**/*","note":"Pattern '**/*' is too broad for D:\\Project\\ATVS\\.claude","dur":1,"status":"block","exit":2,"error":""}
+{"ts":"2026-08-05T13:59:44.538Z","hook":"privacy-block","event":"PreToolUse","tool":"Glob","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:44.539Z","hook":"scout-block","event":"PreToolUse","tool":"Glob","target":"*.md","note":"Pattern '*.md' is too broad for D:\\Project\\ATVS\\.claude\\rules","dur":2,"status":"block","exit":2,"error":""}
+{"ts":"2026-08-05T13:59:44.837Z","hook":"privacy-block","event":"PreToolUse","tool":"Glob","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:44.843Z","hook":"scout-block","event":"PreToolUse","tool":"Glob","target":"*.md","note":"Pattern '*.md' is too broad for D:\\Project\\ATVS\\.claude","dur":2,"status":"block","exit":2,"error":""}
+{"ts":"2026-08-05T13:59:48.083Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:48.085Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude\""}
+{"ts":"2026-08-05T13:59:59.460Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T13:59:59.465Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/Header.tsx\""}
+{"ts":"2026-08-05T13:59:59.463Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:05.402Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:05.411Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/AppLayout.tsx\""}
+{"ts":"2026-08-05T14:00:05.406Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:06.125Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:06.133Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/ck.json\""}
+{"ts":"2026-08-05T14:00:19.249Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:19.252Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/agents/fullstack-developer.md\""}
+{"ts":"2026-08-05T14:00:20.233Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:20.288Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/agents/planner.md\""}
+{"ts":"2026-08-05T14:00:20.892Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:20.894Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/App.tsx\""}
+{"ts":"2026-08-05T14:00:20.897Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:28.648Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:28.648Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/Header.tsx\""}
+{"ts":"2026-08-05T14:00:33.759Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:33.766Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/Header.tsx\""}
+{"ts":"2026-08-05T14:00:52.568Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:52.571Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/rules/development-rules.md\""}
+{"ts":"2026-08-05T14:00:53.678Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:53.683Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/pages/FlowList.tsx\""}
+{"ts":"2026-08-05T14:00:53.683Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:00:56.643Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/rules/skill-domain-routing.md\""}
+{"ts":"2026-08-05T14:00:56.646Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:01:02.532Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/rules/skill-domain-routing.md\""}
+{"ts":"2026-08-05T14:01:02.536Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:01:08.608Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:01:08.608Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/rules/skill-domain-routing.md\""}
+{"ts":"2026-08-05T14:01:12.770Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:01:12.771Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/.claude/rules/skill-domain-routing.md\""}
+{"ts":"2026-08-05T14:01:47.239Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:01:47.241Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/Sidebar.tsx\""}
+{"ts":"2026-08-05T14:01:54.479Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:01:54.481Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/cms/src/layouts/Sidebar.tsx\""}
+{"ts":"2026-08-05T14:02:38.391Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:02:38.393Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:02:42.756Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:02:42.758Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/README.md\""}
+{"ts":"2026-08-05T14:02:50.752Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:02:50.755Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/docs/development.md\""}
+{"ts":"2026-08-05T14:03:28.637Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:03:28.641Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS/CLAUDE.md\""}
+{"ts":"2026-08-05T14:03:28.639Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:04:06.887Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:04:06.888Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS\""}
+{"ts":"2026-08-05T14:04:36.653Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:04:36.662Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS\""}
+{"ts":"2026-08-05T14:04:45.093Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-05T14:04:45.110Z","hook":"scout-block","event":"PreToolUse","tool":"","target":"","note":"","dur":0,"status":"crash","exit":0,"error":"path should be a `path.relative()`d string, but got \"D:/Project/ATVS\""}
+{"ts":"2026-08-06T05:42:54.404Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:54.408Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:55.315Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:55.318Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:58.528Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:58.529Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:58.532Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:58.532Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:59.265Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:42:59.268Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:00.851Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:00.854Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:01.519Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:01.522Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:02.262Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:02.265Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":6,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:02.262Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:02.265Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:03.115Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:03.118Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:07.184Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:43:07.189Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:44:00.657Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:44:00.661Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:44:04.814Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:44:04.816Z","hook":"scout-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:44:05.037Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":1,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:44:05.041Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":5,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:03.187Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:03.189Z","hook":"scout-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:03.960Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:03.962Z","hook":"scout-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:03.990Z","hook":"privacy-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:03.994Z","hook":"scout-block","event":"PreToolUse","tool":"Read","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:35.645Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:35.647Z","hook":"scout-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:47.167Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:45:47.170Z","hook":"scout-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:46:10.231Z","hook":"descriptive-name","event":"PreToolUse","tool":"Write","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:46:10.232Z","hook":"privacy-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:46:10.235Z","hook":"scout-block","event":"PreToolUse","tool":"Write","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:46:21.759Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:46:21.761Z","hook":"scout-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:47:27.079Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:47:27.082Z","hook":"scout-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:47:49.626Z","hook":"privacy-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:47:49.628Z","hook":"scout-block","event":"PreToolUse","tool":"Edit","target":"","note":"","dur":3,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:49:12.504Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":4,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:49:12.520Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":15,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:49:25.969Z","hook":"privacy-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":2,"status":"ok","exit":0,"error":""}
+{"ts":"2026-08-06T05:49:25.974Z","hook":"scout-block","event":"PreToolUse","tool":"Bash","target":"","note":"","dur":6,"status":"ok","exit":0,"error":""}
