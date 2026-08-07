@@ -85,13 +85,13 @@ function _send(ws, obj) {
 function _handleControl(ws, msg, wss) {
   if (msg.type === "beat") return; // heartbeat — ignore
 
-  if (msg.type === "control") {
-    // Echo back to ALL open clients (control links and scene share the page)
+  if (msg.type === "control" || msg.type === "status" || msg.type === "sceneOnline") {
+    // Broadcast to ALL open clients (scene + control pages)
     for (const client of wss.clients) {
       _send(client, msg);
     }
   }
-  // activate / clock / other messages: no-op in standalone
+  // other message types: no-op
 }
 
 /**
