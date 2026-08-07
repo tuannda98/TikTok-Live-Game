@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sàn Nhảy — Điều khiển</title>
+  <style>
+    :root {
+      --bg: #0c0c14;
+      --panel: rgba(18, 18, 30, 0.96);
+      --border: rgba(255,255,255,0.12);
+      --text: #e8e8f2;
+      --muted: #9a9ab0;
+      --accent: #ff2fb9;
+      --accent-2: #22e8ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+      gap: 20px;
+    }
+    h1 {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      text-shadow: 0 0 18px rgba(34,232,255,0.5);
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+    section { display: grid; gap: 8px; }
+    label { color: var(--muted); font-size: 12px; }
+    label b { color: var(--text); font-variant-numeric: tabular-nums; }
+    select, input[type="text"] {
+      width: 100%;
+      background: #14141f;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 9px;
+      outline: none;
+      font: inherit;
+      font-size: 13px;
+    }
+    input[type="text"]:focus { border-color: var(--accent-2); }
+    input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,255,255,0.7);
+    }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      flex: 1 1 auto;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #14141f;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      font: inherit;
+      white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .chip:hover { background: #1f1f2e; }
+    .chip.active { border-color: var(--accent-2); background: rgba(34,232,255,0.12); }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
+    }
+    .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      background: #33334a;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .dot.on  { background: var(--accent-2); box-shadow: 0 0 10px var(--accent-2); }
+    .dot.err { background: #ff4040; box-shadow: 0 0 10px #ff4040; }
+    .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+    .toggles label {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text); cursor: pointer; font-size: 13px;
+    }
+    .toggles input { accent-color: var(--accent); }
+    .ws-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .ws-badge.ok  { border-color: rgba(34,232,255,0.4); color: var(--accent-2); }
+    .ws-badge.err { border-color: rgba(255,64,64,0.4); color: #ff6060; }
+    .hint { font-size: 11px; color: var(--muted); line-height: 1.5; }
+    hr { border: none; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <h1>🕺 Sàn Nhảy — Điều khiển</h1>
+
+  <div class="card">
+    <!-- WebSocket status -->
+    <section>
+      <div class="row" style="align-items:center; justify-content:space-between;">
+        <label>Kết nối cảnh</label>
+        <span class="ws-badge" id="ws-badge">Đang kết nối…</span>
+      </div>
+      <p class="hint">Mở <strong>/games/san-nhay/index.html</strong> trong OBS Browser Source, rồi điều khiển từ đây.</p>
+    </section>
+
+    <hr>
+
+    <!-- TikTok connection -->
+    <section>
+      <label>TikTok Live</label>
+      <input type="text" id="txt-tiktok" placeholder="@tên_tài_khoản hoặc link phiên live" spellcheck="false">
+      <div class="row">
+        <button class="chip" id="btn-live">🔴 Kết nối</button>
+        <button class="chip" id="btn-live-stop">Ngắt</button>
+      </div>
+      <div class="status">
+        <span class="dot" id="live-dot"></span>
+        <span id="live-status">Chưa kết nối</span>
+      </div>
+    </section>
+
+    <!-- Floor effect -->
+    <section>
+      <label for="sel-pattern">Hiệu ứng sàn</label>
+      <select id="sel-pattern">
+        <option value="ripple">Sóng lan toả</option>
+        <option value="checker">Ô cờ nhấp nháy</option>
+        <option value="rainbow">Cầu vồng cuộn</option>
+        <option value="strobe">Nháy ngẫu nhiên</option>
+        <option value="equalizer">Cột nhạc (equalizer)</option>
+        <option value="spiral">Xoáy ốc</option>
+        <option value="heartbeat">Nhịp tim trung tâm</option>
+      </select>
+    </section>
+
+    <!-- Scene -->
+    <section>
+      <label for="sel-scene">Khung cảnh</label>
+      <select id="sel-scene">
+        <option value="cau-lac-bo">Câu lạc bộ trong nhà</option>
+        <option value="bai-bien">Bãi biển đêm</option>
+        <option value="tet">Tết — phố lồng đèn</option>
+        <option value="san-thuong">Sân thượng thành phố</option>
+      </select>
+    </section>
+
+    <!-- LED sign -->
+    <section>
+      <label for="txt-sign">Chữ chạy trên màn LED</label>
+      <input type="text" id="txt-sign" maxlength="28" value="SÀN NHẢY LIVE" spellcheck="false">
+    </section>
+
+    <!-- BPM -->
+    <section>
+      <label for="rng-bpm">Nhịp giả lập <b id="val-bpm">124</b> BPM</label>
+      <input type="range" id="rng-bpm" min="60" max="180" step="1" value="124">
+    </section>
+
+    <!-- Reactivity -->
+    <section>
+      <label for="rng-react">Độ nhạy theo nhạc <b id="val-react">1.40</b></label>
+      <input type="range" id="rng-react" min="0" max="3" step="0.05" value="1.4">
+    </section>
+
+    <!-- Bloom -->
+    <section>
+      <label for="rng-bloom">Độ rực sáng <b id="val-bloom">0.50</b></label>
+      <input type="range" id="rng-bloom" min="0" max="2.5" step="0.05" value="0.5">
+    </section>
+
+    <!-- Toggles -->
+    <section>
+      <label>Bật / Tắt hiệu ứng</label>
+      <div class="toggles">
+        <label><input type="checkbox" id="chk-dancers" checked> Vũ công</label>
+        <label><input type="checkbox" id="chk-beams"   checked> Tia sáng</label>
+        <label><input type="checkbox" id="chk-lasers"  checked> Laser</label>
+        <label><input type="checkbox" id="chk-ball"    checked> Cầu disco</label>
+        <label><input type="checkbox" id="chk-venue"   checked> Tiểu cảnh</label>
+        <label><input type="checkbox" id="chk-signs"   checked> Màn LED</label>
+        <label><input type="checkbox" id="chk-sway"    checked> Lia máy</label>
+        <label><input type="checkbox" id="chk-fireworks" checked> Pháo hoa</label>
+      </div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  // ── WebSocket connection ────────────────────────────────────────────────
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const wsUrl = `${proto}://${location.host}/live`;
+  let ws = null;
+  const wsBadge = document.getElementById('ws-badge');
+  const liveDot  = document.getElementById('live-dot');
+  const liveStatus = document.getElementById('live-status');
+
+  function send(obj) {
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+  }
+
+  function setWsBadge(state) {
+    wsBadge.className = 'ws-badge' + (state === 'ok' ? ' ok' : state === 'err' ? ' err' : '');
+    wsBadge.textContent = state === 'ok' ? '● Đã kết nối cảnh' : state === 'err' ? '✗ Mất kết nối' : 'Đang kết nối…';
+  }
+
+  function connect() {
+    ws = new WebSocket(wsUrl);
+    ws.addEventListener('open', () => setWsBadge('ok'));
+    ws.addEventListener('close', () => { setWsBadge('err'); setTimeout(connect, 3000); });
+    ws.addEventListener('error', () => setWsBadge('err'));
+    ws.addEventListener('message', (e) => {
+      let msg;
+      try { msg = JSON.parse(e.data); } catch { return; }
+      if (msg.type === 'status') {
+        const ok = !!msg.connected;
+        liveDot.className = 'dot' + (ok ? ' on' : msg.message?.startsWith('Lỗi') ? ' err' : '');
+        liveStatus.textContent = msg.message || (ok ? 'Đã kết nối' : 'Chưa kết nối');
+      }
+    });
+  }
+  connect();
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  function ctrl(key, value) { send({ type: 'control', key, value }); }
+
+  function bindRange(id, valId, key, fmt) {
+    const el = document.getElementById(id);
+    const lbl = document.getElementById(valId);
+    el.addEventListener('input', () => {
+      const v = parseFloat(el.value);
+      lbl.textContent = fmt ? fmt(v) : v;
+      ctrl(key, v);
+    });
+  }
+
+  function bindCheck(id, key) {
+    document.getElementById(id).addEventListener('change', (e) => ctrl(key, e.target.checked));
+  }
+
+  // ── TikTok connection ───────────────────────────────────────────────────
+  document.getElementById('btn-live').addEventListener('click', () => {
+    const u = document.getElementById('txt-tiktok').value.trim();
+    if (!u) return;
+    ctrl('liveConnect', u);
+    liveStatus.textContent = 'Đang kết nối…';
+    liveDot.className = 'dot';
+  });
+
+  document.getElementById('btn-live-stop').addEventListener('click', () => {
+    ctrl('liveDisconnect', null);
+    liveDot.className = 'dot';
+    liveStatus.textContent = 'Đã ngắt kết nối';
+  });
+
+  // ── Pattern & scene ─────────────────────────────────────────────────────
+  document.getElementById('sel-pattern').addEventListener('change', (e) => ctrl('pattern', e.target.value));
+  document.getElementById('sel-scene').addEventListener('change',  (e) => ctrl('khungCanh', e.target.value));
+
+  // ── LED sign ─────────────────────────────────────────────────────────────
+  let signTimer;
+  document.getElementById('txt-sign').addEventListener('input', (e) => {
+    clearTimeout(signTimer);
+    signTimer = setTimeout(() => ctrl('signText', e.target.value), 400);
+  });
+
+  // ── Sliders ──────────────────────────────────────────────────────────────
+  bindRange('rng-bpm',   'val-bpm',   'bpm',        v => Math.round(v));
+  bindRange('rng-react', 'val-react', 'reactivity', v => v.toFixed(2));
+  bindRange('rng-bloom', 'val-bloom', 'bloom',       v => v.toFixed(2));
+
+  // ── Toggles ───────────────────────────────────────────────────────────────
+  bindCheck('chk-dancers',  'showDancers');
+  bindCheck('chk-beams',    'showBeams');
+  bindCheck('chk-lasers',   'showLasers');
+  bindCheck('chk-ball',     'showBall');
+  bindCheck('chk-venue',    'showVenue');
+  bindCheck('chk-signs',    'showSigns');
+  bindCheck('chk-sway',     'cameraSway');
+  bindCheck('chk-fireworks','showFireworks');
+})();
+</script>
+</body>
+</html>

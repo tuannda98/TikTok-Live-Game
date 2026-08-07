@@ -35,6 +35,13 @@ export function attachSanNhayWs(server) {
     _send(ws, { type: "session", state: "active", remainingMs: null });
     _send(ws, { type: "quyenChu", ok: true });
 
+    // Broadcast a message to every OTHER connected client
+    ws._broadcast = (obj) => {
+      for (const client of wss.clients) {
+        if (client !== ws) _send(client, obj);
+      }
+    };
+
     ws.on("message", async (raw) => {
       let msg;
       try { msg = JSON.parse(raw); } catch { return; }
@@ -106,16 +113,22 @@ async function _handleLive(ws, msg, setConn) {
     return;
   }
 
+  const broadcast = (obj) => {
+    // Send to LiveClient itself AND all other connections (control pages)
+    _send(ws, obj);
+    if (ws._broadcast) ws._broadcast(obj);
+  };
+
   conn.on("connected", () => {
-    _send(ws, { type: "status", connected: true, message: "Đã kết nối TikTok Live ✓" });
+    broadcast({ type: "status", connected: true, message: "Đã kết nối TikTok Live ✓" });
   });
 
   conn.on("disconnected", () => {
-    _send(ws, { type: "status", connected: false, message: "Mất kết nối TikTok" });
+    broadcast({ type: "status", connected: false, message: "Mất kết nối TikTok" });
   });
 
   conn.on("error", (err) => {
-    _send(ws, { type: "status", connected: false, message: `Lỗi: ${err.message}` });
+    broadcast({ type: "status", connected: false, message: `Lỗi: ${err.message}` });
   });
 
   conn.on("chat", (p) => {

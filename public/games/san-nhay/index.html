@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="/games/san-nhay/styles.css">
 
   <!--
-    Standalone mode: no /s/<token> in URL, so `roomed` class is never added.
-    The control panel is always visible. No activation code needed.
+    Scene page — always in OBS mode (panel hidden). Use /games/san-nhay/control.html
+    to manage the scene. The 'obs' class hides #panel via CSS in styles.css.
   -->
   <script>
-    const _q = new URLSearchParams(location.search);
-    if (_q.has('obs') || _q.get('demo') === '1') {
-      document.documentElement.classList.add('obs');
+    document.documentElement.classList.add('obs');
+    // Also support ?demo=1 for demo mode
+    if (new URLSearchParams(location.search).get('demo') === '1') {
+      document.documentElement.classList.remove('obs');
     }
   </script>
 
