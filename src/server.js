@@ -15,7 +15,10 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, writeFile, unlink } from "fs/promises";
+import { createWriteStream } from "fs";
+import { pipeline } from "stream/promises";
+import ytdl from "@distube/ytdl-core";
 import tiktokService from "./services/TikTokService.js";
 import { attachSanNhayWs } from "./services/sanNhayWs.js";
 
@@ -192,6 +195,72 @@ app.post(
     }
   }
 );
+
+// ==========================================
+// SÀN NHẢY LIVE — YouTube download endpoint
+// POST /games/san-nhay/yt-download?kind=audio|video&url=<youtubeUrl>
+// ==========================================
+
+app.post("/games/san-nhay/yt-download", async (req, res) => {
+  const { kind, url } = req.query;
+  if (!ALLOWED_KINDS[kind] || !url) {
+    return res.status(400).json({ error: "kind must be audio or video, url required" });
+  }
+  if (!ytdl.validateURL(url)) {
+    return res.status(400).json({ error: "URL YouTube không hợp lệ" });
+  }
+
+  // Give large downloads up to 10 minutes
+  req.socket.setTimeout(10 * 60 * 1000);
+
+  let filePath = null;
+  try {
+    const info = await ytdl.getInfo(url);
+    const title = info.videoDetails.title
+      .replace(/[^a-zA-Z0-9._\-()\[\] ]/g, "_")
+      .slice(0, 120);
+
+    let stream, ext;
+    if (kind === "audio") {
+      const fmt = ytdl.chooseFormat(info.formats, {
+        filter: "audioonly",
+        quality: "highestaudio",
+      });
+      ext = fmt.container || "webm";
+      stream = ytdl.downloadFromInfo(info, { format: fmt });
+    } else {
+      // Prefer mp4 with both streams; fall back to highest available
+      let fmt;
+      try {
+        fmt = ytdl.chooseFormat(info.formats, {
+          filter: (f) => f.container === "mp4" && f.hasVideo && f.hasAudio,
+          quality: "highest",
+        });
+      } catch {
+        fmt = ytdl.chooseFormat(info.formats, {
+          filter: (f) => f.hasVideo && f.hasAudio,
+          quality: "highest",
+        });
+      }
+      ext = fmt.container || "mp4";
+      stream = ytdl.downloadFromInfo(info, { format: fmt });
+    }
+
+    const fileName = `${title}.${ext}`;
+    const dir = join(__dirname, "../public/games/san-nhay/assets", kind);
+    await mkdir(dir, { recursive: true });
+    filePath = join(dir, fileName);
+
+    await pipeline(stream, createWriteStream(filePath));
+
+    res.json({ name: fileName });
+  } catch (err) {
+    console.error("[SanNhay] yt-download error:", err.message);
+    // Clean up partial file
+    if (filePath) unlink(filePath).catch(() => {});
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ==========================================
 // SÀN NHẢY LIVE — raw WebSocket on /live

@@ -306,8 +306,12 @@
     <section>
       <label>Nguồn nhạc</label>
       <div class="row">
+        <input type="text" id="txt-yt-music" placeholder="Link YouTube…" style="flex:1; min-width:0;">
+        <button class="chip" id="btn-yt-music" style="flex:0 0 auto;">⬇ Tải</button>
+      </div>
+      <div class="row">
         <button class="chip" id="btn-mic">🎤 Micro</button>
-        <button class="chip" id="btn-music-file">🎵 Chọn nhạc</button>
+        <button class="chip" id="btn-music-file">🎵 File nhạc</button>
         <button class="chip" id="btn-music-stop">■ Dừng</button>
       </div>
       <input type="file" id="input-music" accept="audio/*" hidden>
@@ -315,7 +319,7 @@
         <span class="dot" id="music-dot"></span>
         <span id="music-status">Chưa có nhạc — cảnh dùng nhịp giả lập BPM</span>
       </div>
-      <p class="hint">Micro: stream nhịp từ máy tính tới cảnh theo thời gian thực.<br>Chọn nhạc: upload lên server để cảnh tự phát và phân tích.</p>
+      <p class="hint">YouTube: tải nhạc về server rồi cảnh tự phát.<br>Micro: stream nhịp trực tiếp từ máy tính tới cảnh.</p>
     </section>
 
     <hr>
@@ -324,14 +328,18 @@
     <section>
       <label>Màn hình LED (video)</label>
       <div class="row">
-        <button class="chip" id="btn-video-file">🎬 Chọn video</button>
+        <input type="text" id="txt-yt-video" placeholder="Link YouTube…" style="flex:1; min-width:0;">
+        <button class="chip" id="btn-yt-video" style="flex:0 0 auto;">⬇ Tải</button>
+      </div>
+      <div class="row">
+        <button class="chip" id="btn-video-file">🎬 File video</button>
         <button class="chip" id="btn-video-stop">■ Tắt</button>
       </div>
       <input type="file" id="input-video" accept="video/*" hidden>
       <div class="status">
         <span id="video-status">Chưa có video — màn hình LED hiện GIF</span>
       </div>
-      <p class="hint">Upload video để phát trên màn hình LED trung tâm của cảnh.</p>
+      <p class="hint">YouTube: tải video về server rồi phát trên màn LED trung tâm.</p>
     </section>
   </div>
 
@@ -521,6 +529,25 @@
     }
   });
 
+  // YouTube music download
+  document.getElementById('btn-yt-music').addEventListener('click', async () => {
+    const url = document.getElementById('txt-yt-music').value.trim();
+    if (!url) return;
+    setMusicStatus('Đang tải nhạc từ YouTube…', '');
+    try {
+      const resp = await fetch(
+        `/games/san-nhay/yt-download?kind=audio&url=${encodeURIComponent(url)}`,
+        { method: 'POST' }
+      );
+      if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
+      const { name } = await resp.json();
+      ctrl('music', name);
+      setMusicStatus(`🎵 Đang phát: ${name}`, 'ok');
+    } catch (err) {
+      setMusicStatus('Lỗi YouTube: ' + err.message, 'err');
+    }
+  });
+
   document.getElementById('btn-music-file').addEventListener('click', () =>
     document.getElementById('input-music').click());
 
@@ -548,6 +575,25 @@
 
   // ── Video — upload to server ──────────────────────────────────────────────
   const videoStatus = document.getElementById('video-status');
+
+  // YouTube video download
+  document.getElementById('btn-yt-video').addEventListener('click', async () => {
+    const url = document.getElementById('txt-yt-video').value.trim();
+    if (!url) return;
+    videoStatus.textContent = 'Đang tải video từ YouTube…';
+    try {
+      const resp = await fetch(
+        `/games/san-nhay/yt-download?kind=video&url=${encodeURIComponent(url)}`,
+        { method: 'POST' }
+      );
+      if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
+      const { name } = await resp.json();
+      ctrl('video', name);
+      videoStatus.textContent = `🎬 Đang phát: ${name}`;
+    } catch (err) {
+      videoStatus.textContent = 'Lỗi YouTube: ' + err.message;
+    }
+  });
 
   document.getElementById('btn-video-file').addEventListener('click', () =>
     document.getElementById('input-video').click());
