@@ -213,15 +213,91 @@
     <section>
       <label>Bật / Tắt hiệu ứng</label>
       <div class="toggles">
-        <label><input type="checkbox" id="chk-dancers" checked> Vũ công</label>
-        <label><input type="checkbox" id="chk-beams"   checked> Tia sáng</label>
-        <label><input type="checkbox" id="chk-lasers"  checked> Laser</label>
-        <label><input type="checkbox" id="chk-ball"    checked> Cầu disco</label>
-        <label><input type="checkbox" id="chk-venue"   checked> Tiểu cảnh</label>
-        <label><input type="checkbox" id="chk-signs"   checked> Màn LED</label>
-        <label><input type="checkbox" id="chk-sway"    checked> Lia máy</label>
+        <label><input type="checkbox" id="chk-dancers"   checked> Vũ công</label>
+        <label><input type="checkbox" id="chk-beams"     checked> Tia sáng</label>
+        <label><input type="checkbox" id="chk-lasers"    checked> Laser</label>
+        <label><input type="checkbox" id="chk-ball"      checked> Cầu disco</label>
+        <label><input type="checkbox" id="chk-venue"     checked> Tiểu cảnh</label>
+        <label><input type="checkbox" id="chk-signs"     checked> Màn LED</label>
+        <label><input type="checkbox" id="chk-sway"      checked> Lia máy</label>
         <label><input type="checkbox" id="chk-fireworks" checked> Pháo hoa</label>
+        <label><input type="checkbox" id="chk-gif-show"  checked> GIF màn LED</label>
+        <label><input type="checkbox" id="chk-floor-grid" checked> Lưới sàn</label>
+        <label><input type="checkbox" id="chk-rules"     checked> Luật sàn</label>
       </div>
+    </section>
+
+    <hr>
+
+    <!-- Camera & Atmosphere -->
+    <section>
+      <label>Cảnh quan & Máy quay</label>
+    </section>
+    <section>
+      <label for="rng-exposure">Độ sáng tổng thể <b id="val-exposure">0.84</b></label>
+      <input type="range" id="rng-exposure" min="0.3" max="2.5" step="0.05" value="0.84">
+    </section>
+    <section>
+      <label for="rng-fog">Màn sương <b id="val-fog">0.016</b></label>
+      <input type="range" id="rng-fog" min="0" max="0.05" step="0.001" value="0.016">
+    </section>
+    <section>
+      <label for="rng-floor-bright">Độ sáng sàn <b id="val-floor-bright">0.30</b></label>
+      <input type="range" id="rng-floor-bright" min="0" max="1.5" step="0.05" value="0.3">
+    </section>
+    <section>
+      <label for="rng-flash">Cường độ nhấp nháy <b id="val-flash">0.45</b></label>
+      <input type="range" id="rng-flash" min="0" max="1" step="0.05" value="0.45">
+    </section>
+    <section>
+      <label for="rng-cam-dist">Khoảng cách máy quay <b id="val-cam-dist">26</b></label>
+      <input type="range" id="rng-cam-dist" min="10" max="38" step="1" value="26">
+    </section>
+    <section>
+      <label for="rng-sway-speed">Tốc độ lia máy <b id="val-sway-speed">0.10</b></label>
+      <input type="range" id="rng-sway-speed" min="0.02" max="0.5" step="0.01" value="0.1">
+    </section>
+    <section>
+      <label for="rng-sway-arc">Góc lia máy <b id="val-sway-arc">47</b>°</label>
+      <input type="range" id="rng-sway-arc" min="0" max="90" step="1" value="47">
+    </section>
+    <section>
+      <label for="rng-render">Chất lượng hình <b id="val-render">1.0</b>×</label>
+      <input type="range" id="rng-render" min="1" max="2" step="0.5" value="1">
+    </section>
+
+    <hr>
+
+    <!-- Crowd & Podium -->
+    <section>
+      <label>Đám đông & Bục VIP</label>
+    </section>
+    <section>
+      <label for="rng-podium">Số bục VIP <b id="val-podium">5</b></label>
+      <input type="range" id="rng-podium" min="0" max="8" step="1" value="5">
+    </section>
+    <section>
+      <label for="rng-min-floor">Vũ công tối thiểu trên sàn <b id="val-min-floor">8</b></label>
+      <input type="range" id="rng-min-floor" min="1" max="30" step="1" value="8">
+    </section>
+
+    <hr>
+
+    <!-- Rules panel -->
+    <section>
+      <label>Vị trí bảng luật sàn</label>
+    </section>
+    <section>
+      <label for="rng-rules-x">Ngang <b id="val-rules-x">0</b>%</label>
+      <input type="range" id="rng-rules-x" min="0" max="100" step="1" value="0">
+    </section>
+    <section>
+      <label for="rng-rules-y">Dọc <b id="val-rules-y">0</b>%</label>
+      <input type="range" id="rng-rules-y" min="0" max="100" step="1" value="0">
+    </section>
+    <section>
+      <label for="rng-rules-size">Cỡ chữ <b id="val-rules-size">100</b>%</label>
+      <input type="range" id="rng-rules-size" min="50" max="250" step="5" value="100">
     </section>
   </div>
 
@@ -304,20 +380,42 @@
     signTimer = setTimeout(() => ctrl('signText', e.target.value), 400);
   });
 
-  // ── Sliders ──────────────────────────────────────────────────────────────
+  // ── Sliders — basic ──────────────────────────────────────────────────────
   bindRange('rng-bpm',   'val-bpm',   'bpm',        v => Math.round(v));
   bindRange('rng-react', 'val-react', 'reactivity', v => v.toFixed(2));
   bindRange('rng-bloom', 'val-bloom', 'bloom',       v => v.toFixed(2));
 
+  // ── Sliders — camera & atmosphere ────────────────────────────────────────
+  bindRange('rng-exposure',    'val-exposure',    'exposure',       v => v.toFixed(2));
+  bindRange('rng-fog',         'val-fog',         'fogDensity',     v => v.toFixed(3));
+  bindRange('rng-floor-bright','val-floor-bright','floorBrightness',v => v.toFixed(2));
+  bindRange('rng-flash',       'val-flash',       'flashIntensity', v => v.toFixed(2));
+  bindRange('rng-cam-dist',    'val-cam-dist',    'cameraDistance', v => Math.round(v));
+  bindRange('rng-sway-speed',  'val-sway-speed',  'swaySpeed',      v => v.toFixed(2));
+  bindRange('rng-sway-arc',    'val-sway-arc',    'swayArc',        v => Math.round(v));
+  bindRange('rng-render',      'val-render',      'renderScale',    v => v.toFixed(1));
+
+  // ── Sliders — crowd & podium ─────────────────────────────────────────────
+  bindRange('rng-podium',    'val-podium',    'podiumCount', v => Math.round(v));
+  bindRange('rng-min-floor', 'val-min-floor', 'minOnFloor',  v => Math.round(v));
+
+  // ── Sliders — rules panel ────────────────────────────────────────────────
+  bindRange('rng-rules-x',    'val-rules-x',    'rulesX',    v => Math.round(v));
+  bindRange('rng-rules-y',    'val-rules-y',    'rulesY',    v => Math.round(v));
+  bindRange('rng-rules-size', 'val-rules-size', 'rulesSize', v => Math.round(v));
+
   // ── Toggles ───────────────────────────────────────────────────────────────
-  bindCheck('chk-dancers',  'showDancers');
-  bindCheck('chk-beams',    'showBeams');
-  bindCheck('chk-lasers',   'showLasers');
-  bindCheck('chk-ball',     'showBall');
-  bindCheck('chk-venue',    'showVenue');
-  bindCheck('chk-signs',    'showSigns');
-  bindCheck('chk-sway',     'cameraSway');
-  bindCheck('chk-fireworks','showFireworks');
+  bindCheck('chk-dancers',    'showDancers');
+  bindCheck('chk-beams',      'showBeams');
+  bindCheck('chk-lasers',     'showLasers');
+  bindCheck('chk-ball',       'showBall');
+  bindCheck('chk-venue',      'showVenue');
+  bindCheck('chk-signs',      'showSigns');
+  bindCheck('chk-sway',       'cameraSway');
+  bindCheck('chk-fireworks',  'showFireworks');
+  bindCheck('chk-gif-show',   'showGifShow');
+  bindCheck('chk-floor-grid', 'showFloorGrid');
+  bindCheck('chk-rules',      'showRules');
 })();
 </script>
 </body>
