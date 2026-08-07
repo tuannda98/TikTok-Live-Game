@@ -29,6 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
 	let selectedGame = "horse-racing";
 	let gameEntry = "index.html";
 	let gameParam = "id";
+	let gameNoParam = false;   // true = OBS URL needs no ?id= param
+	let gameControl = null;    // path to separate control page, e.g. "control.html"
+
+	const controlUrlRow  = document.getElementById("controlUrlRow");
+	const controlUrlInput = document.getElementById("controlUrl");
+	const copyControlBtn  = document.getElementById("copyControlBtn");
+	const openControlBtn  = document.getElementById("openControlBtn");
 
 	// ==========================================
 	// GAME SELECTION
@@ -42,10 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
 			card.classList.add("selected");
 			// Update state
 			selectedGame = card.dataset.game;
-			gameEntry = card.dataset.entry || "index.html";
-			gameParam = card.dataset.param || "id";
+			gameEntry    = card.dataset.entry   || "index.html";
+			gameParam    = card.dataset.param   || "id";
+			gameNoParam  = card.dataset.noParam === "true";
+			gameControl  = card.dataset.control || null;
+			// Hide control row when switching games
+			if (controlUrlRow) controlUrlRow.style.display = "none";
 			console.log(
-				`Selected game: ${selectedGame} (${gameEntry}, ${gameParam})`,
+				`Selected game: ${selectedGame} (${gameEntry}, param=${gameNoParam ? "none" : gameParam}, control=${gameControl})`,
 			);
 		});
 	});
@@ -86,11 +97,23 @@ document.addEventListener("DOMContentLoaded", () => {
 		 * - Username will be used as Room ID for Socket.io
 		 */
 		const baseUrl = window.location.origin;
-		const overlayUrl = `${baseUrl}/games/${selectedGame}/${gameEntry}?${gameParam}=${cleanUsername}`;
+		const overlayUrl = gameNoParam
+			? `${baseUrl}/games/${selectedGame}/${gameEntry}`
+			: `${baseUrl}/games/${selectedGame}/${gameEntry}?${gameParam}=${cleanUsername}`;
 
 		// Show output section
 		outputUrl.value = overlayUrl;
 		outputSection.classList.add("visible");
+
+		// Show control URL row if this game has a separate control page
+		if (gameControl && controlUrlRow) {
+			const ctrlUrl = `${baseUrl}/games/${selectedGame}/${gameControl}`;
+			controlUrlInput.value = ctrlUrl;
+			openControlBtn.href = ctrlUrl;
+			controlUrlRow.style.display = "block";
+		} else if (controlUrlRow) {
+			controlUrlRow.style.display = "none";
+		}
 
 		// Scroll to output
 		outputSection.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -128,6 +151,26 @@ document.addEventListener("DOMContentLoaded", () => {
 			showToast("✅ Link copied!", "success");
 		}
 	});
+
+	// ==========================================
+	// COPY CONTROL URL
+	// ==========================================
+	if (copyControlBtn) {
+		copyControlBtn.addEventListener("click", async () => {
+			const url = controlUrlInput.value;
+			if (!url) return;
+			try {
+				await navigator.clipboard.writeText(url);
+				showToast("✅ Control link copied!", "success");
+				copyControlBtn.textContent = "✅ Copied!";
+				setTimeout(() => { copyControlBtn.textContent = "📋 Copy"; }, 2000);
+			} catch {
+				controlUrlInput.select();
+				document.execCommand("copy");
+				showToast("✅ Control link copied!", "success");
+			}
+		});
+	}
 
 	// ==========================================
 	// ENTER KEY SUPPORT
