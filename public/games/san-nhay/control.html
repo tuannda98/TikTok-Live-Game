@@ -299,6 +299,40 @@
       <label for="rng-rules-size">Cỡ chữ <b id="val-rules-size">100</b>%</label>
       <input type="range" id="rng-rules-size" min="50" max="250" step="5" value="100">
     </section>
+
+    <hr>
+
+    <!-- Music source -->
+    <section>
+      <label>Nguồn nhạc</label>
+      <div class="row">
+        <button class="chip" id="btn-mic">🎤 Micro</button>
+        <button class="chip" id="btn-music-file">🎵 Chọn nhạc</button>
+        <button class="chip" id="btn-music-stop">■ Dừng</button>
+      </div>
+      <input type="file" id="input-music" accept="audio/*" hidden>
+      <div class="status">
+        <span class="dot" id="music-dot"></span>
+        <span id="music-status">Chưa có nhạc — cảnh dùng nhịp giả lập BPM</span>
+      </div>
+      <p class="hint">Micro: stream nhịp từ máy tính tới cảnh theo thời gian thực.<br>Chọn nhạc: upload lên server để cảnh tự phát và phân tích.</p>
+    </section>
+
+    <hr>
+
+    <!-- Video screen -->
+    <section>
+      <label>Màn hình LED (video)</label>
+      <div class="row">
+        <button class="chip" id="btn-video-file">🎬 Chọn video</button>
+        <button class="chip" id="btn-video-stop">■ Tắt</button>
+      </div>
+      <input type="file" id="input-video" accept="video/*" hidden>
+      <div class="status">
+        <span id="video-status">Chưa có video — màn hình LED hiện GIF</span>
+      </div>
+      <p class="hint">Upload video để phát trên màn hình LED trung tâm của cảnh.</p>
+    </section>
   </div>
 
 <script>
@@ -416,6 +450,132 @@
   bindCheck('chk-gif-show',   'showGifShow');
   bindCheck('chk-floor-grid', 'showFloorGrid');
   bindCheck('chk-rules',      'showRules');
+
+  // ── Music — mic / file upload ─────────────────────────────────────────────
+  const musicDot    = document.getElementById('music-dot');
+  const musicStatus = document.getElementById('music-status');
+
+  let audioCtx = null, analyser = null, micStream = null, frameTimer = null;
+
+  function setMusicStatus(msg, state) {
+    musicStatus.textContent = msg;
+    musicDot.className = 'dot' + (state === 'ok' ? ' on' : state === 'err' ? ' err' : '');
+  }
+
+  async function ensureCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser  = audioCtx.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.25;
+    }
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+  }
+
+  function stopFrameTimer() {
+    if (frameTimer) { clearInterval(frameTimer); frameTimer = null; }
+  }
+
+  function startFrameLoop() {
+    stopFrameTimer();
+    const freq = new Uint8Array(analyser.frequencyBinCount);
+    const N = 20;
+    let env = 0;
+    frameTimer = setInterval(() => {
+      analyser.getByteFrequencyData(freq);
+      const n = freq.length;
+      const avg = (a, b) => { let s = 0; for (let i = a; i < b; i++) s += freq[i]; return s / Math.max(1, b - a) / 255; };
+      const bass   = avg(0,               Math.floor(n * 0.06));
+      const mid    = avg(Math.floor(n * 0.06), Math.floor(n * 0.3));
+      const treble = avg(Math.floor(n * 0.3),  Math.floor(n * 0.75));
+      const level  = bass * 0.55 + mid * 0.3 + treble * 0.15;
+      env += (bass - env) * 0.34;
+      const beat  = bass > env * 1.4 && bass > 0.08;
+      const end   = Math.floor(n * 0.75);
+      const bands = Array.from({ length: N }, (_, i) =>
+        avg(Math.floor(end * i / N), Math.floor(end * (i + 1) / N)));
+      ctrl('audioFrame', { beat, bass, mid, treble, level, envelope: env, bands });
+    }, 50);
+  }
+
+  function stopMusic() {
+    stopFrameTimer();
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    ctrl('audioFrame', null);
+    ctrl('music', null);
+    setMusicStatus('Chưa có nhạc — cảnh dùng nhịp giả lập BPM', '');
+  }
+
+  document.getElementById('btn-mic').addEventListener('click', async () => {
+    try {
+      await ensureCtx();
+      if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+      micStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      });
+      audioCtx.createMediaStreamSource(micStream).connect(analyser);
+      startFrameLoop();
+      setMusicStatus('🎤 Đang nghe micro — stream nhịp tới cảnh', 'ok');
+    } catch (e) {
+      setMusicStatus('Lỗi micro: ' + e.message, 'err');
+    }
+  });
+
+  document.getElementById('btn-music-file').addEventListener('click', () =>
+    document.getElementById('input-music').click());
+
+  document.getElementById('btn-music-stop').addEventListener('click', stopMusic);
+
+  document.getElementById('input-music').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMusicStatus('Đang upload nhạc…', '');
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._\-]/g, '_');
+      const resp = await fetch(
+        `/games/san-nhay/upload?kind=audio&name=${encodeURIComponent(safeName)}`,
+        { method: 'POST', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file }
+      );
+      if (!resp.ok) throw new Error(await resp.text());
+      const { name } = await resp.json();
+      ctrl('music', name);
+      setMusicStatus(`🎵 Đang phát: ${name}`, 'ok');
+    } catch (err) {
+      setMusicStatus('Lỗi upload: ' + err.message, 'err');
+    }
+    e.target.value = '';
+  });
+
+  // ── Video — upload to server ──────────────────────────────────────────────
+  const videoStatus = document.getElementById('video-status');
+
+  document.getElementById('btn-video-file').addEventListener('click', () =>
+    document.getElementById('input-video').click());
+
+  document.getElementById('btn-video-stop').addEventListener('click', () => {
+    ctrl('video', null);
+    videoStatus.textContent = 'Đã tắt — màn hình LED hiện GIF';
+  });
+
+  document.getElementById('input-video').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    videoStatus.textContent = 'Đang upload video…';
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._\-]/g, '_');
+      const resp = await fetch(
+        `/games/san-nhay/upload?kind=video&name=${encodeURIComponent(safeName)}`,
+        { method: 'POST', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file }
+      );
+      if (!resp.ok) throw new Error(await resp.text());
+      const { name } = await resp.json();
+      ctrl('video', name);
+      videoStatus.textContent = `🎬 Đang phát: ${name}`;
+    } catch (err) {
+      videoStatus.textContent = 'Lỗi: ' + err.message;
+    }
+    e.target.value = '';
+  });
 })();
 </script>
 </body>

@@ -15,6 +15,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { mkdir, writeFile } from "fs/promises";
 import tiktokService from "./services/TikTokService.js";
 import { attachSanNhayWs } from "./services/sanNhayWs.js";
 
@@ -161,6 +162,36 @@ io.on("connection", (socket) => {
     socket.emit("pong", { timestamp: Date.now() });
   });
 });
+
+// ==========================================
+// SÀN NHẢY LIVE — media upload endpoint
+// POST /games/san-nhay/upload?kind=audio|video&name=filename
+// ==========================================
+
+const ALLOWED_KINDS = { audio: true, video: true };
+
+app.post(
+  "/games/san-nhay/upload",
+  express.raw({ type: "*/*", limit: "300mb" }),
+  async (req, res) => {
+    const { kind, name } = req.query;
+    if (!ALLOWED_KINDS[kind] || !name) {
+      return res.status(400).json({ error: "kind must be audio or video, name required" });
+    }
+    const safeName = String(name)
+      .replace(/[^a-zA-Z0-9._\-()\[\] ]/g, "_")
+      .slice(0, 200);
+    const dir = join(__dirname, "../public/games/san-nhay/assets", kind);
+    try {
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, safeName), req.body);
+      res.json({ name: safeName });
+    } catch (err) {
+      console.error("[SanNhay] upload error:", err.message);
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
 
 // ==========================================
 // SÀN NHẢY LIVE — raw WebSocket on /live
