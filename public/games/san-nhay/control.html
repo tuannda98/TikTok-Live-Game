@@ -306,10 +306,6 @@
     <section>
       <label>Nguồn nhạc</label>
       <div class="row">
-        <input type="text" id="txt-yt-music" placeholder="Link YouTube…" style="flex:1; min-width:0;">
-        <button class="chip" id="btn-yt-music" style="flex:0 0 auto;">▶ Phát</button>
-      </div>
-      <div class="row">
         <button class="chip" id="btn-mic">🎤 Micro</button>
         <button class="chip" id="btn-music-file">🎵 File nhạc</button>
         <button class="chip" id="btn-music-stop">■ Dừng</button>
@@ -319,7 +315,7 @@
         <span class="dot" id="music-dot"></span>
         <span id="music-status">Chưa có nhạc — cảnh dùng nhịp giả lập BPM</span>
       </div>
-      <p class="hint">YouTube: stream nhạc trực tiếp từ YouTube — không cần tải về.<br>Micro: stream nhịp trực tiếp từ máy tính tới cảnh.</p>
+      <p class="hint">Micro: stream nhịp trực tiếp từ máy tính tới cảnh.</p>
     </section>
 
     <hr>
@@ -328,10 +324,6 @@
     <section>
       <label>Màn hình LED (video)</label>
       <div class="row">
-        <input type="text" id="txt-yt-video" placeholder="Link YouTube…" style="flex:1; min-width:0;">
-        <button class="chip" id="btn-yt-video" style="flex:0 0 auto;">▶ Phát</button>
-      </div>
-      <div class="row">
         <button class="chip" id="btn-video-file">🎬 File video</button>
         <button class="chip" id="btn-video-stop">■ Tắt</button>
       </div>
@@ -339,7 +331,6 @@
       <div class="status">
         <span id="video-status">Chưa có video — màn hình LED hiện GIF</span>
       </div>
-      <p class="hint">YouTube: stream video trực tiếp từ YouTube lên màn LED trung tâm.</p>
     </section>
   </div>
 
@@ -529,25 +520,6 @@
     }
   });
 
-  // YouTube music — stream directly from YouTube via server proxy
-  document.getElementById('btn-yt-music').addEventListener('click', async () => {
-    const url = document.getElementById('txt-yt-music').value.trim();
-    if (!url) return;
-    setMusicStatus('Đang chuẩn bị nhạc từ YouTube…', '');
-    try {
-      const resp = await fetch(
-        `/games/san-nhay/yt-prepare?kind=audio&url=${encodeURIComponent(url)}`,
-        { method: 'POST' }
-      );
-      if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
-      const { name, title } = await resp.json();
-      ctrl('music', name);
-      setMusicStatus(`🎵 Đang phát: ${title || name}`, 'ok');
-    } catch (err) {
-      setMusicStatus('Lỗi YouTube: ' + err.message, 'err');
-    }
-  });
-
   document.getElementById('btn-music-file').addEventListener('click', () =>
     document.getElementById('input-music').click());
 
@@ -575,25 +547,6 @@
 
   // ── Video — upload to server ──────────────────────────────────────────────
   const videoStatus = document.getElementById('video-status');
-
-  // YouTube video — stream directly from YouTube via server proxy
-  document.getElementById('btn-yt-video').addEventListener('click', async () => {
-    const url = document.getElementById('txt-yt-video').value.trim();
-    if (!url) return;
-    videoStatus.textContent = 'Đang chuẩn bị video từ YouTube…';
-    try {
-      const resp = await fetch(
-        `/games/san-nhay/yt-prepare?kind=video&url=${encodeURIComponent(url)}`,
-        { method: 'POST' }
-      );
-      if (!resp.ok) { const e = await resp.json(); throw new Error(e.error); }
-      const { name, title } = await resp.json();
-      ctrl('video', name);
-      videoStatus.textContent = `🎬 Đang phát: ${title || name}`;
-    } catch (err) {
-      videoStatus.textContent = 'Lỗi YouTube: ' + err.message;
-    }
-  });
 
   document.getElementById('btn-video-file').addEventListener('click', () =>
     document.getElementById('input-video').click());

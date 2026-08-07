@@ -16,7 +16,6 @@ import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { mkdir, writeFile } from "fs/promises";
-import ytdl from "@distube/ytdl-core";
 import tiktokService from "./services/TikTokService.js";
 import { attachSanNhayWs } from "./services/sanNhayWs.js";
 
@@ -39,63 +38,6 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-
-// ==========================================
-// SÀN NHẢY LIVE — YouTube streaming proxy
-// In-memory map: `kind:key` → ytUrl (cleared on restart)
-// Virtual files: /games/san-nhay/assets/audio/_yt_<key>.webm
-//                /games/san-nhay/assets/video/_yt_<key>.mp4
-// Route MUST be registered before express.static
-// ==========================================
-
-const ytStreamMap = new Map();
-
-function ytKey(url) {
-  return Buffer.from(url).toString("base64url").slice(0, 20);
-}
-
-app.get(
-  "/games/san-nhay/assets/:kind(audio|video)/:filename",
-  async (req, res, next) => {
-    const { kind, filename } = req.params;
-    if (!filename.startsWith("_yt_")) return next();
-
-    const key = filename.replace(/^_yt_/, "").replace(/\.[^.]+$/, "");
-    const ytUrl = ytStreamMap.get(`${kind}:${key}`);
-    if (!ytUrl) return res.status(404).json({ error: "Stream not registered — prepare first" });
-
-    try {
-      const info = await ytdl.getInfo(ytUrl);
-      let fmt;
-      if (kind === "audio") {
-        fmt = ytdl.chooseFormat(info.formats, { filter: "audioonly", quality: "highestaudio" });
-      } else {
-        try {
-          fmt = ytdl.chooseFormat(info.formats, {
-            filter: (f) => f.container === "mp4" && f.hasVideo && f.hasAudio,
-            quality: "highest",
-          });
-        } catch {
-          fmt = ytdl.chooseFormat(info.formats, {
-            filter: (f) => f.hasVideo && f.hasAudio,
-            quality: "highest",
-          });
-        }
-      }
-
-      res.setHeader("Content-Type", fmt.mimeType?.split(";")[0] || (kind === "audio" ? "audio/webm" : "video/mp4"));
-      res.setHeader("Cache-Control", "no-store");
-      res.setHeader("Accept-Ranges", "none");
-
-      const stream = ytdl.downloadFromInfo(info, { format: fmt });
-      stream.pipe(res);
-      req.on("close", () => stream.destroy());
-    } catch (err) {
-      console.error("[SanNhay] yt-stream error:", err.message);
-      if (!res.headersSent) res.status(500).json({ error: err.message });
-    }
-  }
-);
 
 // ==========================================
 // MIDDLEWARE & STATIC FILES
@@ -250,51 +192,6 @@ app.post(
     }
   }
 );
-
-// ==========================================
-// SÀN NHẢY LIVE — YouTube prepare endpoint
-// POST /games/san-nhay/yt-prepare?kind=audio|video&url=<youtubeUrl>
-// Returns virtual filename; actual streaming happens via the route above
-// ==========================================
-
-app.post("/games/san-nhay/yt-prepare", async (req, res) => {
-  const { kind, url } = req.query;
-  if (!ALLOWED_KINDS[kind] || !url) {
-    return res.status(400).json({ error: "kind must be audio or video, url required" });
-  }
-  if (!ytdl.validateURL(url)) {
-    return res.status(400).json({ error: "URL YouTube không hợp lệ" });
-  }
-  try {
-    const info = await ytdl.getInfo(url);
-    const title = info.videoDetails.title
-      .replace(/[^a-zA-Z0-9._\-()\[\] ]/g, "_")
-      .slice(0, 100);
-
-    let ext;
-    if (kind === "audio") {
-      const fmt = ytdl.chooseFormat(info.formats, { filter: "audioonly", quality: "highestaudio" });
-      ext = fmt.container || "webm";
-    } else {
-      try {
-        const fmt = ytdl.chooseFormat(info.formats, {
-          filter: (f) => f.container === "mp4" && f.hasVideo && f.hasAudio,
-        });
-        ext = fmt.container || "mp4";
-      } catch {
-        ext = "mp4";
-      }
-    }
-
-    const key = ytKey(url);
-    ytStreamMap.set(`${kind}:${key}`, url);
-
-    res.json({ name: `_yt_${key}.${ext}`, title });
-  } catch (err) {
-    console.error("[SanNhay] yt-prepare error:", err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // ==========================================
 // SÀN NHẢY LIVE — raw WebSocket on /live
