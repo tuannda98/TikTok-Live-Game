@@ -16,6 +16,7 @@ import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import tiktokService from "./services/TikTokService.js";
+import { attachSanNhayWs } from "./services/sanNhayWs.js";
 
 // ES Module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -160,6 +161,12 @@ io.on("connection", (socket) => {
     socket.emit("pong", { timestamp: Date.now() });
   });
 });
+
+// ==========================================
+// SÀN NHẢY LIVE — raw WebSocket on /live
+// ==========================================
+
+attachSanNhayWs(server);
 
 // ==========================================
 // START SERVER

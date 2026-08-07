@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sàn Nhảy LIVE</title>
+
+  <link rel="stylesheet" href="/games/san-nhay/styles.css">
+
+  <!--
+    Standalone mode: no /s/<token> in URL, so `roomed` class is never added.
+    The control panel is always visible. No activation code needed.
+  -->
+  <script>
+    const _q = new URLSearchParams(location.search);
+    if (_q.has('obs') || _q.get('demo') === '1') {
+      document.documentElement.classList.add('obs');
+    }
+  </script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene" width="0" height="0"></canvas>
+
+  <!-- Rules panel (bottom-left) -->
+  <div id="rules">
+    <div class="rules-tieu-de">LUẬT SÀN</div>
+    <div class="rules-ds" id="rules-ds"></div>
+  </div>
+
+  <!-- Sound unlock button (shown only when browser blocks autoplay) -->
+  <button id="sound-gate" hidden>🔇 Bấm để bật tiếng nhạc</button>
+
+  <!-- Session clock (hidden in standalone mode) -->
+  <div id="session-clock" hidden><span id="session-time">--:--</span></div>
+
+  <!-- Session notice (shown only if session state goes wrong — not in standalone) -->
+  <div id="session-notice" hidden>
+    <div class="notice-title" id="notice-title"></div>
+  </div>
+
+  <!-- scene-hint: only shown when URL is /s/<token> — not in standalone -->
+  <div id="scene-hint" style="display:none"></div>
+
+  <!-- Control panel -->
+  <aside id="panel">
+    <header>
+      <h2>Bảng điều khiển</h2>
+      <button id="btn-collapse" title="Ẩn/hiện (phím H)">–</button>
+    </header>
+
+    <div class="panel-body">
+      <section>
+        <label for="sel-pattern">Hiệu ứng sàn</label>
+        <select id="sel-pattern"></select>
+      </section>
+
+      <section>
+        <label for="txt-tiktok">TikTok Live</label>
+        <input type="text" id="txt-tiktok" placeholder="@tên_tài_khoản hoặc link phiên live" spellcheck="false">
+        <div class="row">
+          <button id="btn-live" class="chip">🔴 Kết nối</button>
+          <button id="btn-live-stop" class="chip">Ngắt</button>
+        </div>
+        <div class="status"><span id="live-status">Chưa kết nối</span></div>
+      </section>
+
+      <section>
+        <label for="txt-sign">Chữ chạy trên màn LED</label>
+        <input type="text" id="txt-sign" maxlength="28" value="SÀN NHẢY LIVE" spellcheck="false">
+      </section>
+
+      <section>
+        <label>Nguồn nhạc</label>
+        <div class="row">
+          <button id="btn-mic" class="chip">🎤 Micro</button>
+          <button id="btn-file" class="chip">🎵 Chọn nhạc</button>
+          <button id="btn-toggle" class="chip">⏯ Phát/Dừng</button>
+        </div>
+        <input type="file" id="input-file" accept="audio/*" hidden>
+        <div class="status">
+          <span id="beat-dot"></span>
+          <span id="audio-status">Chưa có nhạc — đang dùng nhịp giả lập</span>
+        </div>
+      </section>
+
+      <section>
+        <label for="rng-bpm">Nhịp giả lập <b id="val-bpm">124</b> BPM</label>
+        <input type="range" id="rng-bpm" min="60" max="180" step="1" value="124">
+      </section>
+
+      <section>
+        <label for="rng-react">Độ nhạy theo nhạc <b id="val-react">1.40</b></label>
+        <input type="range" id="rng-react" min="0" max="3" step="0.05" value="1.4">
+      </section>
+
+      <section>
+        <label for="rng-bloom">Độ rực sáng <b id="val-bloom">0.50</b></label>
+        <input type="range" id="rng-bloom" min="0" max="2.5" step="0.05" value="0.5">
+      </section>
+
+      <section class="toggles">
+        <label><input type="checkbox" id="chk-dancers" checked> Vũ công</label>
+        <label><input type="checkbox" id="chk-beams" checked> Tia sáng</label>
+        <label><input type="checkbox" id="chk-lasers" checked> Laser</label>
+        <label><input type="checkbox" id="chk-ball" checked> Cầu disco</label>
+        <label><input type="checkbox" id="chk-venue" checked> Tiểu cảnh</label>
+        <label><input type="checkbox" id="chk-signs" checked> Màn LED</label>
+        <label><input type="checkbox" id="chk-sway" checked> Lia máy</label>
+      </section>
+
+      <footer>
+        <span id="fps">0 FPS</span>
+        <span class="keys">Space: đổi hiệu ứng · H: ẩn bảng · F: toàn màn hình</span>
+      </footer>
+    </div>
+  </aside>
+
+  <script type="module" src="/games/san-nhay/san/canh.js"></script>
+</body>
+</html>

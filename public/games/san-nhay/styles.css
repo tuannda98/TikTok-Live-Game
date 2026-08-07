@@ -1,0 +1,552 @@
+:root {
+  --bg: #05050a;
+  --panel: rgba(14, 14, 24, 0.72);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #e8e8f2;
+  --muted: #9a9ab0;
+  --accent: #ff2fb9;
+  --accent-2: #22e8ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- Màn hình chờ ---------- */
+/* ---------- Băng chữ chạy luật chơi (đáy màn hình) ---------- */
+/* Đây là lớp phủ HTML chứ không phải bảng LED trong cảnh 3D: chữ luôn sắc nét và
+   không bao giờ bị camera lia đi mất — khán giả cần đọc được nó bất cứ lúc nào.
+   Cố tình KHÔNG ẩn ở chế độ OBS, vì nó là một phần của luồng phát sóng.
+
+   VÌ SAO Ở ĐÁY chứ không phải giữa hay trên: bản trước là một bảng vuông 268px đặt
+   giữa khung, và nó che mất chính cái sàn đang là sản phẩm. Băng ngang mỏng đọc
+   được y hệt mà chỉ ăn 36px. Đáy cũng là chỗ duy nhất còn trống — đồng hồ phiên
+   chiếm góc phải trên, lời chỉ đường chiếm góc trái trên. */
+/*
+  VỊ TRÍ DỌC do trang điều khiển chỉnh, tính bằng PHẦN TRĂM TỪ TRÊN XUỐNG:
+  0 = sát mép trên, 100 = sát mép dưới, 50 = giữa khung.
+
+  Cặp `top` + `translateY` là mẹo để hai đầu mút nằm khít mép chứ không tràn ra
+  ngoài: `translateY` tính theo chiều cao của CHÍNH băng chữ, nên ở mốc 100 nó tự
+  lùi lên đúng bằng thân mình. Nếu chỉ đặt `top: 100%` thì cả băng rơi khỏi màn hình.
+
+  Biến giữ SỐ TRẦN không kèm đơn vị, để một giá trị dùng được cho cả hai phép tính
+  với hai đơn vị khác nhau.
+*/
+/*
+  BẢNG LUẬT SÀN — khung cố định có icon, đặt góc TRÁI (giống bảng LUẬT bên F4).
+
+  --rules-co : hệ số phóng cả bảng (trang điều khiển đặt qua datCoChu). 1 = gốc.
+  --rules-y  : vị trí dọc 0–100% (datViTri). top + translateY để 0=đỉnh, 100=đáy.
+*/
+#rules {
+  --rules-co: 1;
+
+  position: fixed;
+  left: calc(var(--rules-x, 2) * 1%);
+  top: calc(var(--rules-y, 100) * 1%);
+  /* translate ÂM theo chính mình để mốc 0 sát mép trái/trên, 100 sát mép phải/dưới
+     mà bảng không bao giờ lòi ra ngoài khung. */
+  transform: translate(calc(var(--rules-x, 2) * -1%), calc(var(--rules-y, 100) * -1%));
+  z-index: 15;
+  pointer-events: none;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+
+  /* max-content để vừa dòng dài nhất; trần rộng rãi để KHÔNG cắt cụt chữ (trước
+     đây 46vw cắt trên màn hẹp → chữ tràn ra viền). Đệm phải rộng hơn cho thoáng. */
+  width: max-content;
+  max-width: min(92vw, 560px);
+  padding: calc(11px * var(--rules-co)) calc(20px * var(--rules-co)) calc(12px * var(--rules-co)) calc(15px * var(--rules-co));
+  background: linear-gradient(160deg, rgba(18, 8, 30, 0.86), rgba(8, 10, 26, 0.82));
+  border-radius: calc(16px * var(--rules-co));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 22px rgba(255, 47, 185, 0.16);
+
+  /* Lớp hợp thành riêng — tránh lộ ô tối khi canvas WebGL đổi khung. */
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/*
+  VIỀN GRADIENT CHẠY quanh khung. Lớp ::before phủ kín khung, tô conic-gradient
+  xoay theo biến góc --rules-ang; mặt nạ (mask) trừ phần ruột đi nên CHỈ còn lộ
+  cái vòng viền. Đổi góc liên tục → dải màu chạy vòng quanh.
+*/
+@property --rules-ang {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+#rules::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px; /* độ dày viền */
+  background: conic-gradient(from var(--rules-ang),
+    #ff2fb9, #22e8ff, #b06bff, #ffd84d, #ff2fb9);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: rules-vien 5s linear infinite;
+  pointer-events: none;
+}
+@keyframes rules-vien {
+  to { --rules-ang: 360deg; }
+}
+/* Giảm chuyển động: để viền đứng yên (vẫn là dải gradient đẹp, chỉ không xoay). */
+@media (prefers-reduced-motion: reduce) {
+  #rules::before { animation: none; }
+}
+
+.rules-tieu-de {
+  font-size: calc(0.8rem * var(--rules-co));
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #fff;
+  margin-bottom: calc(8px * var(--rules-co));
+  padding-bottom: calc(6px * var(--rules-co));
+  border-bottom: 1px solid rgba(34, 232, 255, 0.3);
+  text-shadow: 0 0 14px rgba(255, 47, 185, 0.6);
+}
+
+.rules-ds {
+  display: flex;
+  flex-direction: column;
+  gap: calc(5px * var(--rules-co));
+}
+
+/* Mỗi luật một dòng: icon · thao tác · mũi tên · kết quả */
+.rules-dong {
+  display: flex;
+  align-items: center;
+  gap: calc(8px * var(--rules-co));
+  font-size: calc(0.82rem * var(--rules-co));
+  line-height: 1.35;
+  color: #e9e9f6;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.rules-ic {
+  flex: none;
+  width: calc(1.5rem * var(--rules-co));
+  text-align: center;
+  font-size: calc(1.02rem * var(--rules-co));
+}
+
+/* Thao tác khán giả phải làm — nổi hẳn lên khỏi phần diễn giải */
+.rules-key {
+  flex: none;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--accent-2);
+  text-shadow: 0 0 12px rgba(34, 232, 255, 0.7);
+}
+
+.rules-mui {
+  flex: none;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.rules-txt {
+  color: #d8d8ea;
+}
+
+/* ---------- Lời nhắc bật tiếng ---------- */
+/* Trình duyệt không cho trang tự phát tiếng khi chưa ai bấm vào nó lần nào. Máy
+   khách trong mạng LAN mở lên là dính ngay, mà không có gì báo thì người xem chỉ
+   thấy im lặng và không hiểu vì sao. Nút này chỉ hiện đúng lúc đó rồi tự biến. */
+#sound-gate {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 16;
+  border: 1px solid rgba(34, 232, 255, 0.55);
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(255, 47, 185, 0.92), rgba(122, 43, 255, 0.92));
+  box-shadow: 0 0 26px rgba(255, 47, 185, 0.55);
+  animation: gate-pulse 1.8s ease-in-out infinite;
+}
+#sound-gate[hidden] { display: none; }
+
+@keyframes gate-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 26px rgba(255, 47, 185, 0.55); }
+  50%      { transform: scale(1.04); box-shadow: 0 0 40px rgba(34, 232, 255, 0.6); }
+}
+
+/* ---------- Đồng hồ thời gian thuê còn lại ---------- */
+/* Chỉ có phút:giây, không bao giờ có token phòng hay mã kích hoạt — khung hình này
+   đang lên sóng, thứ gì hiện ra là cả phiên live đọc được. */
+/*
+  ĐỒNG HỒ PHIÊN: CỐ Ý ẨN HẲN Ở TRANG CẢNH.
+
+  Trang này là khung hình đang phát sóng. Số phút thuê còn lại là chuyện giữa nơi
+  cho thuê và người thuê — khán giả TikTok không việc gì phải thấy, và một cái
+  đồng hồ đếm lùi ở góc màn hình chỉ khiến buổi live trông như bản dùng thử.
+
+  Không mất mát gì: trang điều khiển vẫn hiện đầy đủ ở dòng trạng thái phiên
+  ("Đang chạy · còn 23:30:59" — xem `sessionStateEl` trong `controlPage.js`), mà
+  đó mới là chỗ người thuê ngồi nhìn.
+
+  Muốn bật lại: đổi `none` thành `flex`. Toàn bộ phần trang trí bên dưới vẫn còn
+  nguyên nên không phải dựng lại gì.
+*/
+#session-clock {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 17;
+  display: none;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  pointer-events: none;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums; /* con số không co giãn khi đếm lùi */
+  color: #dfe4ff;
+  background: rgba(8, 8, 18, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+#session-clock[hidden] { display: none; }
+
+#session-clock::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7cff4f;
+  box-shadow: 0 0 8px #7cff4f;
+}
+
+/* Dưới 5 phút: đổi màu và nhấp nháy chậm để lọt vào mắt mà không giật giũ */
+#session-clock.low { color: #ffd24a; border-color: rgba(255, 210, 74, 0.5); }
+#session-clock.low::before {
+  background: #ffb020;
+  box-shadow: 0 0 10px #ffb020;
+  animation: clock-blink 1.2s ease-in-out infinite;
+}
+@keyframes clock-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+/* Trước đây có một khối riêng thu nhỏ và làm mờ đồng hồ ở chế độ OBS. Nay đồng hồ
+   ẩn hẳn trên trang cảnh (xem chú thích ở `#session-clock`) nên khối đó đã bỏ —
+   để lại chỉ khiến người sau tưởng đồng hồ vẫn hiện và đi tìm nhầm chỗ. */
+
+/* ---------- Thông báo lớn về phiên thuê ---------- */
+/* Che kín cảnh có chủ ý: phiên chưa kích hoạt hay đã hết giờ thì sàn bên dưới
+   không còn là thứ nên phát đi, và người vận hành cần một câu trả lời rõ ràng chứ
+   không phải một màn hình vẫn chạy mà không nghe lệnh. */
+#session-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  /*
+    CỐ Ý KHÔNG dùng `backdrop-filter` ở đây, dù nó làm nền đẹp hơn.
+
+    Bảng này phủ KÍN khung hình và nằm trên canvas WebGL. Mỗi khung, trình duyệt
+    phải chụp lại toàn bộ nền phía sau để làm mờ; canvas thì đổi nội dung 60 lần
+    mỗi giây. Khi ảnh chụp chưa kịp sẵn sàng, chỗ đó bị tô đen — người xem thấy
+    một mảng vuông đen loé lên rồi mất.
+
+    Đúng loại lỗi mà chú thích ở `#rules` đã tả, lần đó chữa bằng cách ép phần tử
+    lên lớp hợp thành riêng. Ở đây chọn cách dứt điểm hơn: bỏ hẳn hiệu ứng mờ. Nền
+    đã đục 88% nên gần như không nhìn ra khác biệt, mà đổi lại không còn phép chụp
+    nền nào chạy trên khung hình đang phát sóng.
+  */
+  background: rgba(3, 3, 9, 0.88);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+#session-notice[hidden] { display: none; }
+
+.notice-title {
+  font-size: clamp(1.4rem, 4vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-shadow: 0 0 28px rgba(255, 47, 185, 0.75);
+}
+/* Dòng phụ dưới tiêu đề đã bỏ hẳn: trang này đang phát sóng, mọi câu giải thích
+   đều là chuyện riêng của người thuê bị đọc to trước mặt khán giả. Lý do thật nay
+   nằm ở tiêu đề tab — xem SESSION_NOTICES trong src/main.js. */
+
+/* Màn hình hẹp thì thu bớt bề ngang cho khỏi đè lên sàn */
+@media (max-width: 900px) {
+  #rules { max-width: 62vw; }
+  .rules-dong { font-size: calc(0.76rem * var(--rules-co)); }
+}
+
+/* ---------- Bảng điều khiển ---------- */
+/* Chế độ OBS (?obs=1): luồng hình sạch. Chỉ giấu bảng điều khiển — bảng LED luật
+   chơi vẫn hiện, vì nó là thứ khán giả cần đọc chứ không phải công cụ vận hành.
+
+   Bắt theo class trên thẻ <html> chứ không phải <body>: class đó do một script
+   đồng bộ trong <head> gắn, có mặt trước khi trình duyệt vẽ khung đầu tiên. Nếu
+   chờ module chính gắn vào <body> thì mỗi lần F5 bảng điều khiển lại loé ra một
+   nhịp trong lúc Three.js còn đang tải. Vẫn nhận cả `body.obs` cho chắc. */
+:root.obs #panel,
+body.obs #panel {
+  display: none !important;
+}
+
+/* Mở theo mã phòng (`/s/<mã>`): bảng tại chỗ bị giấu hẳn vì mã cảnh không được phép
+   gửi khoá điều khiển — để nó lại thì người dùng bấm mà không có gì xảy ra rồi tưởng
+   hệ thống hỏng. Lưu ý: các widget bên trong VẪN được dựng và vẫn gắn sự kiện, vì
+   `applyRemote` áp lệnh từ xa bằng cách đặt giá trị lên chính chúng rồi phát sự kiện
+   — giấu là chuyện của mắt nhìn, không phải chuyện của mã. */
+:root.roomed #panel {
+  display: none !important;
+}
+
+/* Lời chỉ đường thay cho bảng. Chỉ hiện khi có mã phòng, và tắt hẳn khi lên sóng.
+ *
+ * TỰ TAN SAU 8 GIÂY. Lý do: `?obs=1` mới giấu được nó, mà người thuê thường dán
+ * thẳng link cảnh vào OBS không kèm tham số — thế là lời nhắn dành riêng cho người
+ * vận hành nằm chình ình trên sóng suốt buổi. Nó chỉ cần được đọc đúng một lần lúc
+ * mới mở link, nên hết việc thì biến.
+ *
+ * Dùng `visibility` chứ không `display` vì `display` không chuyển động được;
+ * `forwards` giữ trạng thái cuối để nó không hiện lại. */
+#scene-hint { display: none; }
+:root.roomed #scene-hint {
+  display: block;
+  animation: hint-tan 1.1s ease 8s forwards;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  padding: 9px 14px;
+  border-radius: 10px;
+  pointer-events: none;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  /* Nền đục hơn `--panel` một chút để bù cho việc bỏ `backdrop-filter` — cùng lý
+     do với `#session-notice`: mọi phép chụp nền trên canvas WebGL đều có nguy cơ
+     loé ra mảng đen, và trang này đang lên sóng. */
+  background: rgba(14, 14, 24, 0.86);
+  border: 1px solid var(--border);
+}
+/* Dòng phụ về phím tắt: nhỏ và mờ hơn, vì nó chỉ dành cho người quen tay bấm Space
+   rồi thấy không có gì xảy ra và đi tìm lời giải thích. */
+:root.roomed #scene-hint span {
+  display: block;
+  margin-top: 5px;
+  max-width: 30ch;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+@keyframes hint-tan {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* Có `?obs=1` thì không cần chờ 8 giây — giấu ngay từ khung hình đầu tiên. */
+:root.roomed.obs #scene-hint { display: none; }
+
+#panel {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  width: 290px;
+  background: var(--panel);
+  /* Chỗ DUY NHẤT còn giữ `backdrop-filter`, và giữ được vì bảng này bị ẩn hẳn khi
+     trang mở theo mã phòng (`:root.roomed #panel`) — tức là nó không bao giờ có
+     mặt trên khung hình đang phát sóng. Hai lớp phủ kia đã phải bỏ hiệu ứng mờ vì
+     chúng CÓ lên sóng; xem chú thích ở `#session-notice`. */
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  z-index: 10;
+  font-size: 13px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+#panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+#panel h2 { margin: 0; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+#btn-collapse {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.panel-body { padding: 12px 14px 10px; display: grid; gap: 14px; }
+#panel.collapsed .panel-body { display: none; }
+
+#panel section { display: grid; gap: 7px; }
+#panel label { color: var(--muted); font-size: 12px; }
+#panel label b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+select, input[type="range"] { width: 100%; }
+
+select,
+input[type="text"] {
+  width: 100%;
+  background: #14141f;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+}
+
+input[type="text"]:focus {
+  border-color: var(--accent-2);
+}
+
+input[type="range"] {
+  appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+.row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/*
+ * ⚠ `[hidden]` phải thắng MỌI luật `display` của trang.
+ *
+ * Trình duyệt chỉ cài `[hidden] { display: none }` ở mức thấp nhất, nên bất kỳ
+ * lớp nào khai `display` — như `.row { display: flex }` ngay trên — đều đè lên
+ * nó. Hậu quả có thật: ô nhập mã kích hoạt được gán `hidden` sau khi kích hoạt
+ * xong nhưng VẪN HIỆN suốt buổi, vì nó nằm trong một `.row`. Trước đây phải vá
+ * lẻ từng id (`#session-clock[hidden]`, `#session-notice[hidden]`…) và cứ thêm
+ * phần tử mới là quên một lần nữa. Một luật ở đây chặn cả họ lỗi đó.
+ */
+[hidden] { display: none !important; }
+
+.chip {
+  flex: 1 1 auto;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #14141f;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.chip:hover { background: #1f1f2e; }
+.chip.active { border-color: var(--accent-2); background: rgba(34, 232, 255, 0.14); }
+
+.status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11.5px; }
+
+#beat-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #33334a;
+  flex: 0 0 auto;
+  transition: background 0.05s linear, box-shadow 0.05s linear;
+}
+#beat-dot.on { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+
+.toggles { grid-template-columns: 1fr 1fr; display: grid; gap: 8px 10px; }
+.toggles label { display: flex; align-items: center; gap: 6px; color: var(--text); cursor: pointer; }
+.toggles input { accent-color: var(--accent); }
+
+/* ---------- Mục kích hoạt phiên (chỉ có ở trang điều khiển) ---------- */
+/* Phiên chưa kích hoạt thì các mục còn lại vừa bị `disabled` vừa mờ đi. Chỉ làm mờ
+   là chưa đủ — người dùng vẫn bấm được và không hiểu vì sao không có gì xảy ra. */
+#panel section.locked { opacity: 0.4; }
+#panel section.locked label { cursor: default; }
+
+#activate-row input[type="text"] { flex: 1 1 120px; width: auto; }
+#activate-row button { flex: 0 0 auto; }
+
+/* Giãn chữ ra cho dễ soát từng số một khi đọc mã cho nhau qua điện thoại */
+#txt-code {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+}
+
+.status .warn { color: #ffd24a; font-weight: 700; }
+
+#panel footer {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-top: 1px solid var(--border);
+  padding-top: 9px;
+  color: #6d6d85;
+  font-size: 11px;
+}
+
+/* Lối liên lạc ở đáy bảng điều khiển — sáng hơn dòng số liệu bên trên để lúc
+   hoảng còn tìm thấy, nhưng vẫn không tranh chỗ với các nút điều khiển. */
+#panel footer .ho-tro {
+  color: #7cc4ff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 3px 0;
+}
+#panel footer .ho-tro:hover { text-decoration: underline; }
+
+/* Dòng nhắc tải lại trang — mờ hơn hẳn lối liên lạc ngay trên, vì nó là lời dặn
+   một lần chứ không phải thứ cần tìm lúc đang hoảng. */
+#panel footer .dang-lam {
+  color: #5c5c72;
+  line-height: 1.45;
+}
+.keys { line-height: 1.5; }
+
+@media (max-width: 640px) {
+  #panel { width: calc(100% - 32px); top: auto; bottom: 16px; }
+  .toggles { grid-template-columns: 1fr 1fr; }
+}
