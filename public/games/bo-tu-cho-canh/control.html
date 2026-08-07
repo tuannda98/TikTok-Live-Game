@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bộ Tứ Chó Cảnh — Điều khiển</title>
+  <style>
+    :root { --bg: #0d0b1a; --card: #18152e; --border: #2e2850; --accent: #7c6fcd; --gold: #ffd86a; --ok: #22c77a; --err: #ef4444; --text: #e2deff; --muted: #7a729c; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; min-height: 100vh; padding: 20px; }
+    h1 { font-size: 20px; font-weight: 900; color: var(--gold); margin-bottom: 18px; letter-spacing: 0.5px; }
+    h1 span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+    .card-title { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; margin-top: 10px; }
+    label:first-of-type { margin-top: 0; }
+    input[type=text] { width: 100%; background: #0d0b1a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 15px; padding: 9px 12px; outline: none; transition: border-color .2s; }
+    input[type=text]:focus { border-color: var(--accent); }
+    .row { display: flex; gap: 8px; margin-top: 10px; }
+    button { flex: 1; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 700; padding: 10px 14px; cursor: pointer; transition: opacity .15s, transform .1s; }
+    button:hover { opacity: .85; }
+    button:active { transform: scale(.97); }
+    button.outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    button.danger { background: var(--err); }
+    .status-bar { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--muted); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background .3s; }
+    .dot.ok { background: var(--ok); }
+    .dot.err { background: var(--err); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid2 .group { display: flex; flex-direction: column; gap: 4px; }
+    .grid2 label { margin-top: 0; }
+    .ws-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 3px 9px; border-radius: 20px; background: rgba(255,255,255,.06); margin-bottom: 4px; }
+    textarea { width: 100%; background: #0d0b1a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 9px 12px; outline: none; resize: none; transition: border-color .2s; font-family: inherit; }
+    textarea:focus { border-color: var(--accent); }
+    .timer { font-size: 28px; font-weight: 900; text-align: center; color: var(--gold); letter-spacing: 3px; margin-bottom: 4px; }
+    .timer-label { text-align: center; font-size: 12px; color: var(--muted); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+  </style>
+</head>
+<body>
+  <h1>🐕 Bộ Tứ Chó Cảnh <span>Bảng điều khiển</span></h1>
+
+  <!-- Connection status -->
+  <div class="card">
+    <div class="card-title">Kết nối</div>
+    <div class="ws-badge"><span class="dot" id="ws-dot"></span><span id="ws-text">Máy chủ: đang kết nối…</span></div>
+    <div class="ws-badge" style="margin-top:6px"><span class="dot" id="scene-dot"></span><span id="scene-text">Trang cảnh: chưa mở</span></div>
+  </div>
+
+  <!-- Session timer -->
+  <div class="card">
+    <div class="card-title">Thời gian live</div>
+    <div class="timer" id="timer">00:00:00</div>
+    <div class="timer-label" id="timer-label">Chưa bắt đầu</div>
+  </div>
+
+  <!-- TikTok connect -->
+  <div class="card">
+    <div class="card-title">TikTok Live</div>
+    <label for="txt-username">Tên tài khoản TikTok</label>
+    <input type="text" id="txt-username" placeholder="@ten_tai_khoan" spellcheck="false">
+    <div class="row">
+      <button id="btn-connect">🔴 Kết nối</button>
+      <button id="btn-disconnect" class="outline">Ngắt</button>
+    </div>
+    <div class="status-bar"><span class="dot" id="live-dot"></span><span id="live-text">Chưa kết nối</span></div>
+  </div>
+
+  <!-- Dog nicknames -->
+  <div class="card">
+    <div class="card-title">Tên bộ tứ <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(tự động lưu khi gõ)</span></div>
+    <div class="grid2">
+      <div class="group"><label>🌹 Chihuahua (Hoa)</label><input type="text" id="nick-chihuahua" value="Tí Khè" spellcheck="false" maxlength="40"></div>
+      <div class="group"><label>🎵 White dog (TikTok)</label><input type="text" id="nick-bun" value="Moi Bảnh" spellcheck="false" maxlength="40"></div>
+      <div class="group"><label>👏 Husky (Hoan hô)</label><input type="text" id="nick-husky" value="Hưng Husky" spellcheck="false" maxlength="40"></div>
+      <div class="group"><label>🐱 Belgian (Đỉnh)</label><input type="text" id="nick-begie" value="Long Mõm" spellcheck="false" maxlength="40"></div>
+    </div>
+    <label for="txt-team">Tên nhóm</label>
+    <input type="text" id="txt-team" value="F4 Báo Thủ Online" spellcheck="false" maxlength="60">
+    <label for="txt-slogan">Khẩu hiệu</label>
+    <textarea id="txt-slogan" rows="2" spellcheck="false" maxlength="120">Bốn anh em, một cái mõm — không ngán khu phố nào.</textarea>
+  </div>
+
+  <!-- Panel positions -->
+  <div class="card">
+    <div class="card-title">Vị trí bảng <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(kéo thanh để điều chỉnh)</span></div>
+    <div id="panel-fields"></div>
+    <div class="row" style="margin-top:12px">
+      <button id="btn-reset-layout" class="outline">↺ Reset mặc định</button>
+    </div>
+  </div>
+
+  <script>
+    // ── WebSocket ─────────────────────────────────────────────────────────────
+    const wsDot = document.getElementById('ws-dot');
+    const wsText = document.getElementById('ws-text');
+    let ws = null, beatTimer = null;
+
+    function connectWs() {
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      ws = new WebSocket(`${proto}://${location.host}/live`);
+      ws.onopen = () => {
+        wsDot.className = 'dot ok'; wsText.textContent = 'Máy chủ: đã kết nối';
+        ws.send(JSON.stringify({ type: 'beat' }));
+        beatTimer = setInterval(() => ws.readyState === 1 && ws.send(JSON.stringify({ type: 'beat' })), 4000);
+      };
+      ws.onmessage = (e) => {
+        let m; try { m = JSON.parse(e.data); } catch { return; }
+        if (m.type === 'sceneOnline') {
+          document.getElementById('scene-dot').className = 'dot ok';
+          document.getElementById('scene-text').textContent = 'Trang cảnh: đã nối';
+        } else if (m.type === 'status') {
+          const dot = document.getElementById('live-dot');
+          const txt = document.getElementById('live-text');
+          dot.className = 'dot ' + (m.connected ? 'ok' : 'err');
+          txt.textContent = m.message || (m.connected ? 'Đang live' : 'Mất kết nối');
+        }
+      };
+      ws.onclose = () => {
+        wsDot.className = 'dot err'; wsText.textContent = 'Máy chủ: mất kết nối — đang thử lại…';
+        document.getElementById('scene-dot').className = 'dot';
+        document.getElementById('scene-text').textContent = 'Trang cảnh: chưa mở';
+        clearInterval(beatTimer); setTimeout(connectWs, 3000);
+      };
+    }
+    connectWs();
+
+    function sendControl(key, value) {
+      if (!ws || ws.readyState !== 1) return;
+      ws.send(JSON.stringify({ type: 'control', key, value }));
+    }
+
+    // ── TikTok Live ───────────────────────────────────────────────────────────
+    let sessionStart = null, clockTimer = null;
+
+    document.getElementById('btn-connect').onclick = () => {
+      const raw = document.getElementById('txt-username').value.trim();
+      const username = raw.replace(/^@/, '').toLowerCase();
+      if (!username) return;
+      sendControl('liveConnect', username);
+      sessionStart = Date.now();
+      document.getElementById('timer-label').textContent = 'Đang live…';
+      clearInterval(clockTimer);
+      clockTimer = setInterval(updateClock, 1000);
+    };
+
+    document.getElementById('btn-disconnect').onclick = () => {
+      sendControl('liveDisconnect');
+      clearInterval(clockTimer);
+      document.getElementById('timer-label').textContent = 'Đã dừng';
+      document.getElementById('live-dot').className = 'dot';
+      document.getElementById('live-text').textContent = 'Chưa kết nối';
+    };
+
+    function updateClock() {
+      if (!sessionStart) return;
+      const s = Math.floor((Date.now() - sessionStart) / 1000);
+      const h = String(Math.floor(s / 3600)).padStart(2, '0');
+      const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+      const ss = String(s % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${h}:${m}:${ss}`;
+    }
+
+    // ── Nicknames & team — auto-send on input ─────────────────────────────────
+    let chuTimer = null;
+    function sendChu() {
+      clearTimeout(chuTimer);
+      chuTimer = setTimeout(() => {
+        sendControl('f4Chu', {
+          chihuahua: document.getElementById('nick-chihuahua').value,
+          bun: document.getElementById('nick-bun').value,
+          husky: document.getElementById('nick-husky').value,
+          begie: document.getElementById('nick-begie').value,
+          tenNhom: document.getElementById('txt-team').value,
+          khauHieu: document.getElementById('txt-slogan').value,
+        });
+      }, 320);
+    }
+    ['nick-chihuahua', 'nick-bun', 'nick-husky', 'nick-begie', 'txt-team', 'txt-slogan']
+      .forEach(id => document.getElementById(id).addEventListener('input', sendChu));
+
+    // ── Panel positions — range sliders, auto-send on input ───────────────────
+    const PANELS = [
+      { key: 'top',  label: 'Bảng TOP tặng quà', def: { x: -186, y: 356,  s: 0.60 } },
+      { key: 'luat', label: 'Bảng LUẬT',         def: { x: -186, y: 46,   s: 0.56 } },
+      { key: 'tieu', label: 'Tên nhóm + khẩu hiệu', def: { x: 0,  y: 548, s: 0.62 } },
+    ];
+    const SLIDERS = [
+      { k: 'x', label: 'Ngang', min: -360, max: 360,  step: 2,    fmt: v => Math.round(v) },
+      { k: 'y', label: 'Dọc',   min: -640, max: 640,  step: 2,    fmt: v => Math.round(v) },
+      { k: 's', label: 'Cỡ',    min: 0.2,  max: 2.4,  step: 0.02, fmt: v => parseFloat(v).toFixed(2) },
+    ];
+
+    const layout = {};
+    const sliderRefs = {}; // { 'top-x': {input, val}, ... }
+    const panelFields = document.getElementById('panel-fields');
+
+    PANELS.forEach((p, pi) => {
+      const saved = JSON.parse(localStorage.getItem('f4ctrl-' + p.key) || 'null') || p.def;
+      layout[p.key] = { ...saved };
+
+      if (pi > 0) { const hr = document.createElement('hr'); panelFields.appendChild(hr); }
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.style.cssText = 'margin-bottom:8px;margin-top:4px;color:#8fe6ff';
+      title.textContent = p.label;
+      panelFields.appendChild(title);
+
+      SLIDERS.forEach(sl => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:8px;margin:4px 0';
+
+        const lbl = document.createElement('span');
+        lbl.style.cssText = 'width:42px;font-size:12px;color:var(--muted);flex:none';
+        lbl.textContent = sl.label;
+
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.min = sl.min; input.max = sl.max; input.step = sl.step;
+        input.value = saved[sl.k];
+        input.style.cssText = 'flex:1;accent-color:var(--accent)';
+
+        const val = document.createElement('span');
+        val.style.cssText = 'width:38px;text-align:right;font-size:12px;color:var(--text);flex:none';
+        val.textContent = sl.fmt(saved[sl.k]);
+
+        sliderRefs[p.key + '-' + sl.k] = { input, val, sl };
+
+        input.addEventListener('input', () => {
+          const v = sl.k === 's' ? parseFloat(input.value) : Math.round(parseFloat(input.value));
+          layout[p.key][sl.k] = v;
+          val.textContent = sl.fmt(input.value);
+          localStorage.setItem('f4ctrl-' + p.key, JSON.stringify(layout[p.key]));
+          sendControl('f4Layout', layout);
+        });
+
+        row.appendChild(lbl); row.appendChild(input); row.appendChild(val);
+        panelFields.appendChild(row);
+      });
+    });
+
+    document.getElementById('btn-reset-layout').onclick = () => {
+      PANELS.forEach(p => {
+        layout[p.key] = { ...p.def };
+        localStorage.removeItem('f4ctrl-' + p.key);
+        SLIDERS.forEach(sl => {
+          const ref = sliderRefs[p.key + '-' + sl.k];
+          if (ref) { ref.input.value = p.def[sl.k]; ref.val.textContent = sl.fmt(p.def[sl.k]); }
+        });
+      });
+      sendControl('f4Layout', layout);
+    };
+  </script>
+</body>
+</html>
