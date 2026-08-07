@@ -305,9 +305,16 @@
     <!-- Music source -->
     <section>
       <label>Nguồn nhạc</label>
+      <div class="row" style="align-items:center;">
+        <select id="sel-music" style="flex:1; min-width:0;">
+          <option value="">— chọn bài nhạc —</option>
+        </select>
+        <button class="chip" id="btn-music-play" style="flex:0 0 auto;">▶ Phát</button>
+        <button class="chip" id="btn-music-refresh" style="flex:0 0 auto;" title="Tải lại danh sách">↺</button>
+      </div>
       <div class="row">
         <button class="chip" id="btn-mic">🎤 Micro</button>
-        <button class="chip" id="btn-music-file">🎵 File nhạc</button>
+        <button class="chip" id="btn-music-file">⬆ Upload</button>
         <button class="chip" id="btn-music-stop">■ Dừng</button>
       </div>
       <input type="file" id="input-music" accept="audio/*" hidden>
@@ -315,7 +322,7 @@
         <span class="dot" id="music-dot"></span>
         <span id="music-status">Chưa có nhạc — cảnh dùng nhịp giả lập BPM</span>
       </div>
-      <p class="hint">Micro: stream nhịp trực tiếp từ máy tính tới cảnh.</p>
+      <p class="hint">Upload file nhạc rồi chọn từ danh sách để phát. Micro: stream nhịp trực tiếp.</p>
     </section>
 
     <hr>
@@ -323,14 +330,22 @@
     <!-- Video screen -->
     <section>
       <label>Màn hình LED (video)</label>
+      <div class="row" style="align-items:center;">
+        <select id="sel-video" style="flex:1; min-width:0;">
+          <option value="">— chọn video —</option>
+        </select>
+        <button class="chip" id="btn-video-play" style="flex:0 0 auto;">▶ Phát</button>
+        <button class="chip" id="btn-video-refresh" style="flex:0 0 auto;" title="Tải lại danh sách">↺</button>
+      </div>
       <div class="row">
-        <button class="chip" id="btn-video-file">🎬 File video</button>
+        <button class="chip" id="btn-video-file">⬆ Upload</button>
         <button class="chip" id="btn-video-stop">■ Tắt</button>
       </div>
       <input type="file" id="input-video" accept="video/*" hidden>
       <div class="status">
         <span id="video-status">Chưa có video — màn hình LED hiện GIF</span>
       </div>
+      <p class="hint">Upload file video rồi chọn từ danh sách để phát trên màn LED.</p>
     </section>
   </div>
 
@@ -520,6 +535,34 @@
     }
   });
 
+  // ── Music dropdown ────────────────────────────────────────────────────────
+  const selMusic = document.getElementById('sel-music');
+
+  async function loadMusicList() {
+    try {
+      const { files } = await fetch('/games/san-nhay/media-list?kind=audio').then(r => r.json());
+      const current = selMusic.value;
+      selMusic.innerHTML = '<option value="">— chọn bài nhạc —</option>';
+      files.forEach(f => {
+        const o = document.createElement('option');
+        o.value = f; o.textContent = f;
+        selMusic.appendChild(o);
+      });
+      if (current && files.includes(current)) selMusic.value = current;
+    } catch {}
+  }
+  loadMusicList();
+
+  document.getElementById('btn-music-play').addEventListener('click', () => {
+    const name = selMusic.value;
+    if (!name) return;
+    stopFrameTimer();
+    ctrl('music', name);
+    setMusicStatus(`🎵 Đang phát: ${name}`, 'ok');
+  });
+
+  document.getElementById('btn-music-refresh').addEventListener('click', loadMusicList);
+
   document.getElementById('btn-music-file').addEventListener('click', () =>
     document.getElementById('input-music').click());
 
@@ -537,6 +580,8 @@
       );
       if (!resp.ok) throw new Error(await resp.text());
       const { name } = await resp.json();
+      await loadMusicList();
+      selMusic.value = name;
       ctrl('music', name);
       setMusicStatus(`🎵 Đang phát: ${name}`, 'ok');
     } catch (err) {
@@ -545,8 +590,33 @@
     e.target.value = '';
   });
 
-  // ── Video — upload to server ──────────────────────────────────────────────
+  // ── Video dropdown ────────────────────────────────────────────────────────
   const videoStatus = document.getElementById('video-status');
+  const selVideo = document.getElementById('sel-video');
+
+  async function loadVideoList() {
+    try {
+      const { files } = await fetch('/games/san-nhay/media-list?kind=video').then(r => r.json());
+      const current = selVideo.value;
+      selVideo.innerHTML = '<option value="">— chọn video —</option>';
+      files.forEach(f => {
+        const o = document.createElement('option');
+        o.value = f; o.textContent = f;
+        selVideo.appendChild(o);
+      });
+      if (current && files.includes(current)) selVideo.value = current;
+    } catch {}
+  }
+  loadVideoList();
+
+  document.getElementById('btn-video-play').addEventListener('click', () => {
+    const name = selVideo.value;
+    if (!name) return;
+    ctrl('video', name);
+    videoStatus.textContent = `🎬 Đang phát: ${name}`;
+  });
+
+  document.getElementById('btn-video-refresh').addEventListener('click', loadVideoList);
 
   document.getElementById('btn-video-file').addEventListener('click', () =>
     document.getElementById('input-video').click());
@@ -568,6 +638,8 @@
       );
       if (!resp.ok) throw new Error(await resp.text());
       const { name } = await resp.json();
+      await loadVideoList();
+      selVideo.value = name;
       ctrl('video', name);
       videoStatus.textContent = `🎬 Đang phát: ${name}`;
     } catch (err) {

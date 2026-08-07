@@ -15,7 +15,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, writeFile, readdir } from "fs/promises";
 import tiktokService from "./services/TikTokService.js";
 import { attachSanNhayWs } from "./services/sanNhayWs.js";
 
@@ -192,6 +192,25 @@ app.post(
     }
   }
 );
+
+// ==========================================
+// SÀN NHẢY LIVE — list uploaded media files
+// GET /games/san-nhay/media-list?kind=audio|video
+// ==========================================
+
+app.get("/games/san-nhay/media-list", async (req, res) => {
+  const { kind } = req.query;
+  if (!ALLOWED_KINDS[kind]) {
+    return res.status(400).json({ error: "kind must be audio or video" });
+  }
+  const dir = join(__dirname, "../public/games/san-nhay/assets", kind);
+  try {
+    const files = await readdir(dir);
+    res.json({ files: files.filter((f) => !f.startsWith(".")) });
+  } catch {
+    res.json({ files: [] });
+  }
+});
 
 // ==========================================
 // SÀN NHẢY LIVE — raw WebSocket on /live
